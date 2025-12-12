@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using MyDiary.UI.Demo;
 
 namespace MyDiary.UI.Views;
 
@@ -75,21 +76,9 @@ public partial class StatisticsView : UserControl
     {
         return _mode switch
         {
-            AggregationMode.Day => (
-                "Серия: настроение по дням (1..5)",
-                new[] { 2, 3, 3, 4, 2, 5, 4, 4, 3, 2, 3, 4, 5, 4 },
-                Enumerable.Range(1, 14).Select(i => $"{i}").ToArray()
-            ),
-            AggregationMode.Week => (
-                "Серия: среднее настроение по неделям (1..5)",
-                new[] { 3, 3, 4, 3, 2, 4, 5, 4 },
-                Enumerable.Range(1, 8).Select(i => $"W{i}").ToArray()
-            ),
-            _ => (
-                "Серия: среднее настроение по месяцам (1..5)",
-                new[] { 3, 3, 2, 4, 4, 3, 2, 3, 4, 5, 4, 3 },
-                new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
-            )
+            AggregationMode.Day => DemoData.BuildSeriesForLastEntryDays(18),
+            AggregationMode.Week => DemoData.BuildSeriesForLastWeeks(10),
+            _ => DemoData.BuildSeriesForLastMonths(3)
         };
     }
 
@@ -245,8 +234,8 @@ public partial class StatisticsView : UserControl
     {
         PieChartCanvas.Children.Clear();
 
-        var (_, series, _) = GetTestSeries();
-        var counts = CountMoods(series);
+        var entries = DemoData.GetEntriesForLastMonths(3);
+        var counts = DemoData.CountMoodLevels(entries);
         PieLegendPanel.Children.Clear();
 
         var w = Math.Max(1, PieChartCanvas.ActualWidth);

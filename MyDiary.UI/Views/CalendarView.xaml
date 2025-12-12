@@ -25,22 +25,16 @@
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
                 <Button x:Name="PrevButton" Content="◀" Width="44" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="PrevButton_Click" />
-                <Button x:Name="NextButton" Content="▶" Width="44" Style="{StaticResource GhostButton}" Margin="0,0,18,0" Click="NextButton_Click" />
-
-                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="12" Padding="6">
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton x:Name="DaysModeRadio" Content="Дни" IsChecked="True" Margin="8,0" Checked="ModeRadio_Checked" Foreground="{StaticResource Brush.Text}" />
-                        <RadioButton x:Name="WeeksModeRadio" Content="Недели" Margin="8,0" Checked="ModeRadio_Checked" Foreground="{StaticResource Brush.Text}" />
-                    </StackPanel>
-                </Border>
+                <Button x:Name="NextButton" Content="▶" Width="44" Style="{StaticResource GhostButton}" Click="NextButton_Click" />
             </StackPanel>
         </Grid>
 
         <Border Grid.Row="1" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18">
-            <Grid>
-                <UniformGrid x:Name="DaysGrid" Columns="7" />
-                <UniformGrid x:Name="WeeksGrid" Columns="13" Visibility="Collapsed" />
-            </Grid>
+            <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
+                <Viewbox Stretch="Uniform">
+                    <UniformGrid x:Name="DaysGrid" Columns="7" Rows="5" Width="420" Height="300" />
+                </Viewbox>
+            </Border>
         </Border>
     </Grid>
 </UserControl>

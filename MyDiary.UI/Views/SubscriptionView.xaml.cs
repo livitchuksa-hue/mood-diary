@@ -13,7 +13,7 @@ public partial class SubscriptionView : UserControl
 
     private void ContinueButton_Click(object sender, RoutedEventArgs e)
     {
-        UiServices.Navigation.Navigate(AppPage.Calendar);
+        UiServices.Navigation.Navigate(AppPage.Entries);
     }
 
     private void BackButton_Click(object sender, RoutedEventArgs e)

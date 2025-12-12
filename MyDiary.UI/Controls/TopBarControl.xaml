@@ -11,15 +11,11 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Календарь" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="CalendarButton_Click" Margin="0,0,10,0" />
+            <Button Grid.Column="0" Content="Записи" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="EntriesButton_Click" Margin="0,0,10,0" />
             <Button Grid.Column="1" Content="Статистика" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="StatisticsButton_Click" Margin="0,0,10,0" />
-            <Button Grid.Column="2" Content="Записи" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="EntriesButton_Click" Margin="0,0,10,0" />
-            <Button Grid.Column="3" Content="+ Запись" Style="{StaticResource PrimaryButton}" Height="44" FontSize="14" Click="AddEntryButton_Click" Margin="0,0,10,0" />
-            <Button Grid.Column="4" Content="Настройки" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="SettingsButton_Click" />
+            <Button Grid.Column="2" Content="Настройки" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="SettingsButton_Click" />
         </Grid>
     </Border>
 </UserControl>

@@ -1,16 +1,16 @@
-using System.Windows.Controls;
 using System;
-using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using MyDiary.UI.Demo;
 
 namespace MyDiary.UI.Views;
 
 public partial class CalendarView : UserControl
 {
     private DateTime _monthCursor = new(DateTime.Today.Year, DateTime.Today.Month, 1);
-    private int _weekCursor = 1;
     private bool _isInitialized;
+    private readonly DateTime _minMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
 
     private static Brush MoodBrush(int moodLevel)
     {
@@ -20,15 +20,16 @@ public partial class CalendarView : UserControl
             2 => "Brush.Mood.Low",
             3 => "Brush.Mood.Mid",
             4 => "Brush.Mood.Good",
-            _ => "Brush.Mood.Great"
+            5 => "Brush.Mood.Great",
+            _ => ""
         };
 
-        if (Application.Current.Resources[key] is SolidColorBrush scb)
+        if (key.Length > 0 && Application.Current.Resources[key] is SolidColorBrush scb)
         {
             return scb;
         }
 
-        return Brushes.LightGray;
+        return (Brush)Application.Current.Resources["Brush.Surface2"];
     }
 
     private static Brush WithAlpha(Brush brush, byte alpha)
@@ -44,6 +45,8 @@ public partial class CalendarView : UserControl
     public CalendarView()
     {
         InitializeComponent();
+
+        _minMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(-2);
 
         Loaded += CalendarView_Loaded;
     }
@@ -61,88 +64,63 @@ public partial class CalendarView : UserControl
 
     private void PrevButton_Click(object sender, RoutedEventArgs e)
     {
-        if (DaysModeRadio.IsChecked == true)
-        {
-            _monthCursor = _monthCursor.AddMonths(-1);
-        }
-        else
-        {
-            _weekCursor = Math.Max(1, _weekCursor - 1);
-        }
-
+        _monthCursor = _monthCursor.AddMonths(-1);
         Render();
     }
 
     private void NextButton_Click(object sender, RoutedEventArgs e)
     {
-        if (DaysModeRadio.IsChecked == true)
-        {
-            _monthCursor = _monthCursor.AddMonths(1);
-        }
-        else
-        {
-            _weekCursor = Math.Min(52, _weekCursor + 1);
-        }
-
-        Render();
-    }
-
-    private void ModeRadio_Checked(object sender, RoutedEventArgs e)
-    {
-        if (!_isInitialized)
-        {
-            return;
-        }
-
+        _monthCursor = _monthCursor.AddMonths(1);
         Render();
     }
 
     private void Render()
     {
-        if (DaysModeRadio.IsChecked == true)
-        {
-            DaysGrid.Visibility = Visibility.Visible;
-            WeeksGrid.Visibility = Visibility.Collapsed;
-            PeriodText.Text = _monthCursor.ToString("MMMM yyyy");
-            var maxMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            NextButton.IsEnabled = _monthCursor < maxMonth;
-            RenderDays();
-        }
-        else
-        {
-            DaysGrid.Visibility = Visibility.Collapsed;
-            WeeksGrid.Visibility = Visibility.Visible;
-            PeriodText.Text = $"Неделя {_weekCursor}";
-            var currentWeek = GetWeekNumber(DateTime.Today);
-            NextButton.IsEnabled = _weekCursor < currentWeek;
-            RenderWeeks();
-        }
+        PeriodText.Text = _monthCursor.ToString("MMMM yyyy");
 
-        PrevButton.IsEnabled = true;
-    }
+        var maxMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        NextButton.IsEnabled = _monthCursor < maxMonth;
+        PrevButton.IsEnabled = _monthCursor > _minMonth;
 
-    private static int GetWeekNumber(DateTime date)
-    {
-        var cal = CultureInfo.CurrentCulture.Calendar;
-        return cal.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        RenderDays();
     }
 
     private void RenderDays()
     {
         DaysGrid.Children.Clear();
 
-        for (var i = 1; i <= 42; i++)
-        {
-            var dayNumber = i;
+        var firstOfMonth = new DateOnly(_monthCursor.Year, _monthCursor.Month, 1);
+        var start = firstOfMonth;
+        var offset = ((int)start.DayOfWeek + 6) % 7;
+        var daysInMonth = DateTime.DaysInMonth(_monthCursor.Year, _monthCursor.Month);
+        var requiredCells = offset + daysInMonth;
+        var rows = requiredCells <= 35 ? 5 : 6;
+        DaysGrid.Rows = rows;
+        DaysGrid.Height = rows == 5 ? 300 : 360;
 
-            var moodLevel = (i % 5) + 1;
-            var mood = MoodBrush(moodLevel);
+        start = start.AddDays(-offset);
+
+        for (var i = 0; i < rows * 7; i++)
+        {
+            var date = start.AddDays(i);
+            var isCurrentMonth = date.Month == firstOfMonth.Month;
+
+            var moodLevel = DemoData.GetMoodLevel(date);
+            var mood = moodLevel == 0 ? (Brush)Application.Current.Resources["Brush.Surface"] : MoodBrush(moodLevel);
+
+            var cellBackground = moodLevel == 0
+                ? (Brush)Application.Current.Resources["Brush.Surface"]
+                : WithAlpha(mood, 80);
+
+            var cellBorder = moodLevel == 0
+                ? (Brush)Application.Current.Resources["Brush.Border"]
+                : WithAlpha(mood, 140);
 
             var border = new Border
             {
                 CornerRadius = new CornerRadius(10),
-                Background = WithAlpha(mood, 80),
-                BorderBrush = WithAlpha(mood, 140),
+                Background = isCurrentMonth ? cellBackground : (Brush)Application.Current.Resources["Brush.Surface2"],
+                BorderBrush = cellBorder,
                 BorderThickness = new Thickness(1),
                 Margin = new Thickness(4),
                 Height = 58
@@ -150,44 +128,15 @@ public partial class CalendarView : UserControl
 
             border.Child = new TextBlock
             {
-                Text = dayNumber.ToString(),
+                Text = date.Day.ToString(),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Foreground = (Brush)Application.Current.Resources["Brush.Text"]
+                Foreground = isCurrentMonth
+                    ? (Brush)Application.Current.Resources["Brush.Text"]
+                    : (Brush)Application.Current.Resources["Brush.TextMuted"]
             };
 
             DaysGrid.Children.Add(border);
-        }
-    }
-
-    private void RenderWeeks()
-    {
-        WeeksGrid.Children.Clear();
-
-        for (var i = 1; i <= 52; i++)
-        {
-            var moodLevel = (i % 5) + 1;
-            var mood = MoodBrush(moodLevel);
-
-            var border = new Border
-            {
-                CornerRadius = new CornerRadius(10),
-                Background = WithAlpha(mood, 70),
-                BorderBrush = WithAlpha(mood, 130),
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(4),
-                Height = 34
-            };
-
-            border.Child = new TextBlock
-            {
-                Text = i.ToString(),
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Foreground = (Brush)Application.Current.Resources["Brush.TextMuted"]
-            };
-
-            WeeksGrid.Children.Add(border);
         }
     }
 }
