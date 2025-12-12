@@ -64,12 +64,18 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
                         <TextBlock Text="Карточки записей" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
 
-                        <Border Grid.Row="1" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="10">
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                            <ComboBox x:Name="MoodFilterCombo" Width="170" Margin="0,0,10,0" SelectionChanged="MoodFilterCombo_SelectionChanged" />
+                            <ComboBox x:Name="ActivityFilterCombo" Width="170" SelectionChanged="ActivityFilterCombo_SelectionChanged" />
+                        </StackPanel>
+
+                        <Border Grid.Row="2" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="10">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                                 <ItemsControl x:Name="EntriesList">
                                     <ItemsControl.ItemTemplate>

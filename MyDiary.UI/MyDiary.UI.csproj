@@ -16,4 +16,9 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Page Remove="Views\CalendarView.xaml" />
+    <Compile Remove="Views\CalendarView.xaml.cs" />
+  </ItemGroup>
+
 </Project>

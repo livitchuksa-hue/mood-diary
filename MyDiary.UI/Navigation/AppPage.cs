@@ -6,7 +6,6 @@ public enum AppPage
     Register = 2,
     Subscription = 3,
 
-    Calendar = 10,
     Statistics = 11,
     Entries = 12,
     AddEntry = 13,

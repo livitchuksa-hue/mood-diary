@@ -21,6 +21,9 @@ public partial class StatisticsView : UserControl
     private bool _isInitialized;
     private AggregationMode _mode = AggregationMode.Day;
 
+    private DateOnly _appliedStart;
+    private DateOnly _appliedEnd;
+
     public StatisticsView()
     {
         InitializeComponent();
@@ -37,8 +40,51 @@ public partial class StatisticsView : UserControl
 
         _isInitialized = true;
 
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        _appliedEnd = today;
+        _appliedStart = today.AddMonths(-2);
+
+        if (StartDatePicker is not null)
+        {
+            StartDatePicker.SelectedDate = _appliedStart.ToDateTime(TimeOnly.MinValue);
+        }
+
+        if (EndDatePicker is not null)
+        {
+            EndDatePicker.SelectedDate = _appliedEnd.ToDateTime(TimeOnly.MinValue);
+        }
+
         LineChartCanvas.SizeChanged += (_, _) => Render();
         PieChartCanvas.SizeChanged += (_, _) => Render();
+
+        Render();
+    }
+
+    private void ApplyButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        var startDt = StartDatePicker?.SelectedDate;
+        var endDt = EndDatePicker?.SelectedDate;
+
+        if (startDt is null || endDt is null)
+        {
+            return;
+        }
+
+        var start = DateOnly.FromDateTime(startDt.Value);
+        var end = DateOnly.FromDateTime(endDt.Value);
+
+        if (end < start)
+        {
+            (start, end) = (end, start);
+        }
+
+        _appliedStart = start;
+        _appliedEnd = end;
 
         Render();
     }
@@ -72,13 +118,90 @@ public partial class StatisticsView : UserControl
         RenderPieChart();
     }
 
-    private (string Legend, int[] Series, string[] Labels) GetTestSeries()
+    private (string Legend, int[] Series, string[] Labels) GetSeries()
     {
+        var filtered = DemoData.Entries
+            .Where(e => e.Date >= _appliedStart && e.Date <= _appliedEnd)
+            .ToList();
+
+        if (filtered.Count == 0)
+        {
+            return ("Нет данных за выбранный период", Array.Empty<int>(), Array.Empty<string>());
+        }
+
         return _mode switch
         {
-            AggregationMode.Day => DemoData.BuildSeriesForLastEntryDays(18),
-            AggregationMode.Week => DemoData.BuildSeriesForLastWeeks(10),
-            _ => DemoData.BuildSeriesForLastMonths(3)
+            AggregationMode.Day => BuildSeriesByDay(filtered),
+            AggregationMode.Week => BuildSeriesByWeek(filtered),
+            _ => BuildSeriesByMonth(filtered)
+        };
+    }
+
+    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByDay(IReadOnlyList<DemoDiaryEntry> entries)
+    {
+        var grouped = entries
+            .GroupBy(e => e.Date)
+            .Select(g => new { Date = g.Key, Avg = (int)Math.Round(g.Average(x => x.MoodLevel)) })
+            .OrderBy(x => x.Date)
+            .ToList();
+
+        return (
+            "Серия: настроение по дням",
+            grouped.Select(x => Math.Clamp(x.Avg, 1, 5)).ToArray(),
+            grouped.Select(x => x.Date.ToDateTime(TimeOnly.MinValue).ToString("dd.MM"))
+                .ToArray()
+        );
+    }
+
+    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByWeek(IReadOnlyList<DemoDiaryEntry> entries)
+    {
+        var grouped = entries
+            .GroupBy(e => WeekStartMonday(e.Date))
+            .Select(g => new { WeekStart = g.Key, Avg = (int)Math.Round(g.Average(x => x.MoodLevel)) })
+            .OrderBy(x => x.WeekStart)
+            .ToList();
+
+        return (
+            "Серия: среднее настроение по неделям",
+            grouped.Select(x => Math.Clamp(x.Avg, 1, 5)).ToArray(),
+            grouped.Select(x => x.WeekStart.ToDateTime(TimeOnly.MinValue).ToString("dd.MM"))
+                .ToArray()
+        );
+    }
+
+    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByMonth(IReadOnlyList<DemoDiaryEntry> entries)
+    {
+        var grouped = entries
+            .GroupBy(e => new DateOnly(e.Date.Year, e.Date.Month, 1))
+            .Select(g => new { Month = g.Key, Avg = (int)Math.Round(g.Average(x => x.MoodLevel)) })
+            .OrderBy(x => x.Month)
+            .ToList();
+
+        return (
+            "Серия: среднее настроение по месяцам",
+            grouped.Select(x => Math.Clamp(x.Avg, 1, 5)).ToArray(),
+            grouped.Select(x => x.Month.ToDateTime(TimeOnly.MinValue).ToString("MMM"))
+                .ToArray()
+        );
+    }
+
+    private static DateOnly WeekStartMonday(DateOnly date)
+    {
+        var dow = (int)date.DayOfWeek;
+        var offset = dow == 0 ? 6 : dow - 1;
+        return date.AddDays(-offset);
+    }
+
+    private static string MoodLabel(int mood)
+    {
+        return mood switch
+        {
+            1 => "Плохо",
+            2 => "Ниже нормы",
+            3 => "Норм",
+            4 => "Хорошо",
+            5 => "Отлично",
+            _ => ""
         };
     }
 
@@ -97,7 +220,7 @@ public partial class StatisticsView : UserControl
     {
         LineChartCanvas.Children.Clear();
 
-        var (legend, series, labels) = GetTestSeries();
+        var (legend, series, labels) = GetSeries();
         LineLegendText.Text = legend;
 
         var w = Math.Max(1, LineChartCanvas.ActualWidth);
@@ -224,6 +347,10 @@ public partial class StatisticsView : UserControl
                 Stroke = lineBrush,
                 StrokeThickness = 2
             };
+
+            var label = i < labels.Length ? labels[i] : (i + 1).ToString();
+            dot.ToolTip = $"{label}\n{MoodLabel(series[i])} ({series[i]}/5)";
+
             Canvas.SetLeft(dot, p.X - dot.Width / 2);
             Canvas.SetTop(dot, p.Y - dot.Height / 2);
             LineChartCanvas.Children.Add(dot);
@@ -234,7 +361,10 @@ public partial class StatisticsView : UserControl
     {
         PieChartCanvas.Children.Clear();
 
-        var entries = DemoData.GetEntriesForLastMonths(3);
+        var entries = DemoData.Entries
+            .Where(e => e.Date >= _appliedStart && e.Date <= _appliedEnd)
+            .ToList();
+
         var counts = DemoData.CountMoodLevels(entries);
         PieLegendPanel.Children.Clear();
 

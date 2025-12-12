@@ -27,7 +27,7 @@ public partial class MainWindow : Window
 
     private void NavigateInternal(AppPage page, object? parameter)
     {
-        TopBar.Visibility = page is AppPage.Calendar or AppPage.Statistics or AppPage.Entries or AppPage.AddEntry or AppPage.Settings or AppPage.EntryDetails
+        TopBar.Visibility = page is AppPage.Statistics or AppPage.Entries or AppPage.AddEntry or AppPage.Settings or AppPage.EntryDetails
             ? Visibility.Visible
             : Visibility.Collapsed;
 
@@ -37,7 +37,6 @@ public partial class MainWindow : Window
             AppPage.Register => new RegisterView(),
             AppPage.Subscription => new SubscriptionView(),
 
-            AppPage.Calendar => new CalendarView(),
             AppPage.Statistics => new StatisticsView(),
             AppPage.Entries => new EntriesView(),
             AppPage.AddEntry => new AddEntryView(),

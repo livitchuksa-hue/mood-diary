@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -16,6 +17,9 @@ public partial class EntriesView : UserControl
     private readonly ObservableCollection<EntryPreview> _items = new();
     private readonly DateTime _minMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
 
+    private int? _moodLevelFilter;
+    private string? _activityFilter;
+
     public EntriesView()
     {
         InitializeComponent();
@@ -23,6 +27,7 @@ public partial class EntriesView : UserControl
         _minMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(-2);
 
         EntriesList.ItemsSource = _items;
+        InitializeFilters();
         UpdateHeader();
         Render();
     }
@@ -36,11 +41,78 @@ public partial class EntriesView : UserControl
     private void RenderEntries()
     {
         var entries = DemoData.GetEntriesForMonth(_monthCursor);
+
+        if (_moodLevelFilter.HasValue)
+        {
+            entries = entries.Where(e => e.MoodLevel == _moodLevelFilter.Value).ToList();
+        }
+
+        if (!string.IsNullOrWhiteSpace(_activityFilter))
+        {
+            entries = entries.Where(e => e.Activities.Contains(_activityFilter)).ToList();
+        }
+
         _items.Clear();
         foreach (var e in entries)
         {
             _items.Add(DemoData.ToPreview(e));
         }
+    }
+
+    private void InitializeFilters()
+    {
+        if (MoodFilterCombo is not null)
+        {
+            MoodFilterCombo.Items.Clear();
+            MoodFilterCombo.Items.Add(new ComboBoxItem { Content = "Все настроения", Tag = null });
+            MoodFilterCombo.Items.Add(new ComboBoxItem { Content = "😔 Плохо", Tag = 1 });
+            MoodFilterCombo.Items.Add(new ComboBoxItem { Content = "😣 Ниже нормы", Tag = 2 });
+            MoodFilterCombo.Items.Add(new ComboBoxItem { Content = "😐 Норм", Tag = 3 });
+            MoodFilterCombo.Items.Add(new ComboBoxItem { Content = "🙂 Хорошо", Tag = 4 });
+            MoodFilterCombo.Items.Add(new ComboBoxItem { Content = "😊 Отлично", Tag = 5 });
+            MoodFilterCombo.SelectedIndex = 0;
+        }
+
+        RefreshActivityFilterItems(keepSelection: false);
+    }
+
+    private void RefreshActivityFilterItems(bool keepSelection)
+    {
+        if (ActivityFilterCombo is null)
+        {
+            return;
+        }
+
+        var prev = keepSelection ? _activityFilter : null;
+
+        var activities = DemoData.GetEntriesForMonth(_monthCursor)
+            .SelectMany(e => e.Activities)
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .Distinct()
+            .OrderBy(a => a)
+            .ToList();
+
+        ActivityFilterCombo.Items.Clear();
+        ActivityFilterCombo.Items.Add(new ComboBoxItem { Content = "Все активности", Tag = null });
+        foreach (var a in activities)
+        {
+            ActivityFilterCombo.Items.Add(new ComboBoxItem { Content = a, Tag = a });
+        }
+
+        if (!string.IsNullOrWhiteSpace(prev) && activities.Contains(prev))
+        {
+            foreach (var item in ActivityFilterCombo.Items)
+            {
+                if (item is ComboBoxItem { Tag: string t } && t == prev)
+                {
+                    ActivityFilterCombo.SelectedItem = item;
+                    return;
+                }
+            }
+        }
+
+        ActivityFilterCombo.SelectedIndex = 0;
+        _activityFilter = null;
     }
 
     private static Brush MoodBrush(int moodLevel)
@@ -139,6 +211,7 @@ public partial class EntriesView : UserControl
     private void PrevMonthButton_Click(object sender, RoutedEventArgs e)
     {
         _monthCursor = _monthCursor.AddMonths(-1);
+        RefreshActivityFilterItems(keepSelection: true);
         UpdateHeader();
         Render();
     }
@@ -146,8 +219,37 @@ public partial class EntriesView : UserControl
     private void NextMonthButton_Click(object sender, RoutedEventArgs e)
     {
         _monthCursor = _monthCursor.AddMonths(1);
+        RefreshActivityFilterItems(keepSelection: true);
         UpdateHeader();
         Render();
+    }
+
+    private void MoodFilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (MoodFilterCombo?.SelectedItem is ComboBoxItem { Tag: int moodLevel })
+        {
+            _moodLevelFilter = moodLevel;
+        }
+        else
+        {
+            _moodLevelFilter = null;
+        }
+
+        RenderEntries();
+    }
+
+    private void ActivityFilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ActivityFilterCombo?.SelectedItem is ComboBoxItem { Tag: string activity } && !string.IsNullOrWhiteSpace(activity))
+        {
+            _activityFilter = activity;
+        }
+        else
+        {
+            _activityFilter = null;
+        }
+
+        RenderEntries();
     }
 
     private void CreateEntryButton_Click(object sender, RoutedEventArgs e)

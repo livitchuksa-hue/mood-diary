@@ -24,8 +24,8 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-                <DatePicker Width="150" Margin="0,0,10,0" />
-                <DatePicker Width="150" Margin="0,0,18,0" />
+                <DatePicker x:Name="StartDatePicker" Width="150" Margin="0,0,10,0" />
+                <DatePicker x:Name="EndDatePicker" Width="150" Margin="0,0,18,0" />
 
                 <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="12" Padding="6">
                     <StackPanel Orientation="Horizontal">
@@ -34,6 +34,8 @@
                         <RadioButton x:Name="MonthModeRadio" GroupName="Agg" Content="Месяц" Margin="8,0" Foreground="{StaticResource Brush.Text}" Checked="ModeRadio_Checked" />
                     </StackPanel>
                 </Border>
+
+                <Button x:Name="ApplyButton" Content="Применить" Style="{StaticResource PrimaryButton}" Margin="18,0,0,0" Click="ApplyButton_Click" />
             </StackPanel>
         </Grid>
 
