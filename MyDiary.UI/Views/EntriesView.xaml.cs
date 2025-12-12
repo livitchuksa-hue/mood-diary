@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using MyDiary.UI.Demo;
 using MyDiary.UI.Models;
@@ -160,6 +161,8 @@ public partial class EntriesView : UserControl
 
         start = start.AddDays(-offset);
 
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
         for (var i = 0; i < rows * 7; i++)
         {
             var date = start.AddDays(i);
@@ -196,8 +199,39 @@ public partial class EntriesView : UserControl
                 FontWeight = isCurrentMonth ? FontWeights.SemiBold : FontWeights.Normal
             };
 
+            border.Tag = date;
+
+            if (isCurrentMonth && date <= today)
+            {
+                border.Cursor = Cursors.Hand;
+                border.MouseLeftButtonUp += CalendarDayBorder_MouseLeftButtonUp;
+            }
+
             CalendarDaysGrid.Children.Add(border);
         }
+    }
+
+    private void CalendarDayBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not Border { Tag: DateOnly date })
+        {
+            return;
+        }
+
+        if (date > DateOnly.FromDateTime(DateTime.Today))
+        {
+            return;
+        }
+
+        var monthEntries = DemoData.GetEntriesForMonth(_monthCursor);
+        var first = monthEntries.FirstOrDefault(x => x.Date == date);
+        if (first is not null)
+        {
+            UiServices.Navigation.Navigate(AppPage.EntryDetails, DemoData.ToPreview(first));
+            return;
+        }
+
+        UiServices.Navigation.Navigate(AppPage.AddEntry);
     }
 
     private void UpdateHeader()

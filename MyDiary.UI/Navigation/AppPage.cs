@@ -10,6 +10,7 @@ public enum AppPage
     Entries = 12,
     AddEntry = 13,
     Settings = 14,
+    CreateActivity = 15,
 
     EntryDetails = 20
 }

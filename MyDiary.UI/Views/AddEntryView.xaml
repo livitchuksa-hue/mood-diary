@@ -7,11 +7,69 @@
              d:DesignHeight="800" d:DesignWidth="1200"
              Background="{StaticResource Brush.Background}">
     <Grid Margin="22">
-        <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
             <StackPanel>
-                <TextBlock Text="Добавление записи" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,8" />
-                <TextBlock Text="Экран будет описан позже. Сейчас это заглушка." Foreground="{StaticResource Brush.TextMuted}" />
+                <TextBlock x:Name="HeaderText" Text="Создать запись" FontSize="22" FontWeight="SemiBold" />
+                <TextBlock Text="Заполни основные данные и нажми Применить" Foreground="{StaticResource Brush.TextMuted}" />
             </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Content="Назад" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="BackButton_Click" />
+                <Button Content="Применить" Style="{StaticResource PrimaryButton}" Click="ApplyButton_Click" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <TextBlock Text="Название" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <TextBox x:Name="TitleBox" Height="44" Padding="12" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" />
+
+                    <TextBlock Text="Эмоция" FontSize="14" FontWeight="SemiBold" Margin="0,18,0,8" />
+                    <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12" Height="107">
+                        <UniformGrid Columns="5" Rows="1">
+                            <RadioButton x:Name="Mood1" GroupName="Mood" Content="😔" Style="{StaticResource MoodTileRadio}" />
+                            <RadioButton x:Name="Mood2" GroupName="Mood" Content="😣" Style="{StaticResource MoodTileRadio}" />
+                            <RadioButton x:Name="Mood3" GroupName="Mood" Content="😐" Style="{StaticResource MoodTileRadio}" IsChecked="True" />
+                            <RadioButton x:Name="Mood4" GroupName="Mood" Content="🙂" Style="{StaticResource MoodTileRadio}" />
+                            <RadioButton x:Name="Mood5" GroupName="Mood" Content="😊" Style="{StaticResource MoodTileRadio}" />
+                        </UniformGrid>
+                    </Border>
+
+                    <TextBlock Text="Активности (можно выбрать несколько)" FontSize="14" FontWeight="SemiBold" Margin="0,18,0,8" />
+                    <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
+                        <WrapPanel>
+                            <CheckBox Content="спорт" Margin="0,0,12,10" />
+                            <CheckBox Content="прогулка" Margin="0,0,12,10" />
+                            <CheckBox Content="работа" Margin="0,0,12,10" />
+                            <CheckBox Content="учёба" Margin="0,0,12,10" />
+                            <CheckBox Content="дом" Margin="0,0,12,10" />
+                            <CheckBox Content="друзья" Margin="0,0,12,10" />
+                            <CheckBox Content="сон" Margin="0,0,12,10" />
+                            <CheckBox Content="хобби" Margin="0,0,12,10" />
+                            <CheckBox Content="музыка" Margin="0,0,12,10" />
+                            <CheckBox Content="чтение" Margin="0,0,12,10" />
+                        </WrapPanel>
+                    </Border>
+
+                    <TextBlock Text="Подробное описание" FontSize="14" FontWeight="SemiBold" Margin="0,18,0,8" />
+                    <TextBox x:Name="ContentBox" Height="240" Padding="12" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                             Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" />
+                </StackPanel>
+            </ScrollViewer>
         </Border>
+
+        <TextBlock Grid.Row="2" Text="Пока это только UI: данные не сохраняются. Кнопка Применить вернёт на Записи." Foreground="{StaticResource Brush.TextMuted}" Margin="0,16,0,0" />
     </Grid>
 </UserControl>

@@ -198,7 +198,7 @@ public partial class StatisticsView : UserControl
         {
             1 => "Плохо",
             2 => "Ниже нормы",
-            3 => "Норм",
+            3 => "Среднее",
             4 => "Хорошо",
             5 => "Отлично",
             _ => ""

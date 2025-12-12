@@ -19,6 +19,7 @@
   <ItemGroup>
     <Page Remove="Views\CalendarView.xaml" />
     <Compile Remove="Views\CalendarView.xaml.cs" />
+    <Compile Remove="AppData.cs" />
   </ItemGroup>
 
 </Project>

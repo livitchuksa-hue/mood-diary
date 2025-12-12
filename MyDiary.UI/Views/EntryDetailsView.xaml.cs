@@ -28,7 +28,7 @@ public partial class EntryDetailsView : UserControl
 
     private void EditButton_Click(object sender, RoutedEventArgs e)
     {
-        UiServices.Navigation.Navigate(AppPage.Entries);
+        UiServices.Navigation.Navigate(AppPage.AddEntry, _entry);
     }
 
     private void DeleteButton_Click(object sender, RoutedEventArgs e)
