@@ -22,7 +22,19 @@
                 <TextBox x:Name="LoginTextBox" Height="40" Margin="0,0,0,12" />
 
                 <TextBlock Text="Пароль" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
-                <PasswordBox x:Name="PasswordBox" Height="40" Margin="0,0,0,18" />
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="44" />
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <PasswordBox x:Name="PasswordBox" Height="40" PasswordChanged="PasswordBox_PasswordChanged" />
+                        <TextBox x:Name="PasswordTextBox" Height="40" Visibility="Collapsed" TextChanged="PasswordTextBox_TextChanged" />
+                    </Grid>
+                    <Button Grid.Column="1" Content="👁" Style="{StaticResource GhostButton}" MinWidth="44" MinHeight="40" Padding="0" Click="TogglePasswordButton_Click" />
+                </Grid>
+
+                <CheckBox x:Name="RememberMeCheckBox" Content="Запомнить меня" Margin="0,0,0,18" />
 
                 <Button Content="Войти" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" />
                 <Button Content="Регистрация" Style="{StaticResource GhostButton}" Margin="0,10,0,0" Click="GoToRegisterButton_Click" />

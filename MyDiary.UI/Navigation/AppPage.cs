@@ -5,6 +5,7 @@ public enum AppPage
     Login = 1,
     Register = 2,
     Subscription = 3,
+    Payment = 4,
 
     Statistics = 11,
     Entries = 12,

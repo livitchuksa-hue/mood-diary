@@ -36,11 +36,13 @@ public partial class MainWindow : Window
             AppPage.Login => new LoginView(),
             AppPage.Register => new RegisterView(),
             AppPage.Subscription => new SubscriptionView(),
+            AppPage.Payment => new PaymentView(parameter),
 
             AppPage.Statistics => new StatisticsView(),
             AppPage.Entries => new EntriesView(),
             AppPage.AddEntry => new AddEntryView(parameter),
             AppPage.Settings => new SettingsView(),
+
             AppPage.CreateActivity => new CreateActivityView(),
 
             AppPage.EntryDetails => new EntryDetailsView(parameter),

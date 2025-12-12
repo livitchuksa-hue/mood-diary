@@ -16,9 +16,9 @@
         <Border Grid.Column="1" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="26" VerticalAlignment="Center">
             <StackPanel>
                 <TextBlock Text="Подписка" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,8" />
-                <TextBlock Text="Выбери тариф. Оплата сейчас условная — кнопка просто откроет приложение." Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,18" />
+                <TextBlock Text="Выбери тариф. Оплата сейчас условная — кнопки пока используются только для навигации." Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" Margin="0,0,0,18" />
 
-                <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="16" Margin="0,0,0,12">
+                <ToggleButton x:Name="PlanMonthToggle" Style="{StaticResource PlanTileToggle}" IsChecked="True">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -28,11 +28,25 @@
                             <TextBlock Text="Месяц" FontSize="18" FontWeight="SemiBold" />
                             <TextBlock Text="Доступ ко всем функциям" Foreground="{StaticResource Brush.TextMuted}" Margin="0,2,0,0" />
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Text="199 ₽" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="320 ₽" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Grid>
-                </Border>
+                </ToggleButton>
 
-                <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="16" Margin="0,0,0,18">
+                <ToggleButton x:Name="PlanHalfYearToggle" Style="{StaticResource PlanTileToggle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="6 месяцев" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="Скидка ~10%" Foreground="{StaticResource Brush.TextMuted}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="1728 ₽" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Grid>
+                </ToggleButton>
+
+                <ToggleButton x:Name="PlanYearToggle" Style="{StaticResource PlanTileToggle}" Margin="0,0,0,18">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -40,13 +54,13 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel>
                             <TextBlock Text="Год" FontSize="18" FontWeight="SemiBold" />
-                            <TextBlock Text="Выгоднее на 35%" Foreground="{StaticResource Brush.TextMuted}" Margin="0,2,0,0" />
+                            <TextBlock Text="Скидка ~20%" Foreground="{StaticResource Brush.TextMuted}" Margin="0,2,0,0" />
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Text="1490 ₽" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="3072 ₽" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </Grid>
-                </Border>
+                </ToggleButton>
 
-                <Button Content="Оплатить и продолжить" Style="{StaticResource PrimaryButton}" Click="ContinueButton_Click" />
+                <Button Content="Перейти к оплате" Style="{StaticResource PrimaryButton}" Click="ContinueButton_Click" />
                 <Button Content="Назад" Style="{StaticResource GhostButton}" Margin="0,10,0,0" Click="BackButton_Click" />
             </StackPanel>
         </Border>
