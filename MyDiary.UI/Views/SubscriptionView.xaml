@@ -1,0 +1,54 @@
+<UserControl x:Class="MyDiary.UI.Views.SubscriptionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="{StaticResource Brush.Background}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="520" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="1" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="26" VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock Text="Подписка" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <TextBlock Text="Выбери тариф. Оплата сейчас условная — кнопка просто откроет приложение." Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,18" />
+
+                <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="16" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Месяц" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="Доступ ко всем функциям" Foreground="{StaticResource Brush.TextMuted}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="199 ₽" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="16" Margin="0,0,0,18">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Год" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="Выгоднее на 35%" Foreground="{StaticResource Brush.TextMuted}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="1490 ₽" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Button Content="Оплатить и продолжить" Style="{StaticResource PrimaryButton}" Click="ContinueButton_Click" />
+                <Button Content="Назад" Style="{StaticResource GhostButton}" Margin="0,10,0,0" Click="BackButton_Click" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyDiary.Domain\MyDiary.Domain.csproj" />
+    <ProjectReference Include="..\MyDiary.Services\MyDiary.Services.csproj" />
+    <ProjectReference Include="..\MyDiary.Data.Interfaces\MyDiary.Data.Interfaces.csproj" />
+    <ProjectReference Include="..\MyDiary.Data.InMemory\MyDiary.Data.InMemory.csproj" />
+    <ProjectReference Include="..\MyDiary.Data.SqlServer\MyDiary.Data.SqlServer.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+</Project>
