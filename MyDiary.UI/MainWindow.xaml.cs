@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MyDiary.UI.Navigation;
+using MyDiary.UI.ViewModels;
 using MyDiary.UI.Views;
 
 namespace MyDiary.UI;
@@ -22,6 +23,11 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         UiServices.Navigation = new MyDiary.UI.Navigation.NavigationService(NavigateInternal);
+
+        var vm = new MainViewModel(UiServices.Navigation);
+        DataContext = vm;
+        TopBar.DataContext = vm;
+
         UiServices.Navigation.Navigate(AppPage.Login);
     }
 

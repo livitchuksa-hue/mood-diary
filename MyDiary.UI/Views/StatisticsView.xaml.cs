@@ -223,6 +223,8 @@ public partial class StatisticsView : UserControl
         var (legend, series, labels) = GetSeries();
         LineLegendText.Text = legend;
 
+        SyncKpis(series);
+
         var w = Math.Max(1, LineChartCanvas.ActualWidth);
         var h = Math.Max(1, LineChartCanvas.ActualHeight);
         if (w <= 2 || h <= 2)
@@ -239,37 +241,65 @@ public partial class StatisticsView : UserControl
         var plotH = Math.Max(1, h - paddingTop - paddingBottom);
 
         var axisBrush = (Brush)Application.Current.Resources["Brush.Border"];
-        var gridBrush = new SolidColorBrush(Color.FromArgb(40, 0, 0, 0));
+        var axisColor = axisBrush is SolidColorBrush ab ? ab.Color : Color.FromRgb(0, 0, 0);
+        var gridBrush = new SolidColorBrush(Color.FromArgb(55, axisColor.R, axisColor.G, axisColor.B));
+        var gridBrushMinor = new SolidColorBrush(Color.FromArgb(25, axisColor.R, axisColor.G, axisColor.B));
         var lineBrush = (Brush)Application.Current.Resources["Brush.Accent"];
 
-        for (var i = 0; i <= 4; i++)
+        // Горизонтальная сетка: основные линии по уровням 1..5 + промежуточные линии (шаг 0.5)
+        for (var k = 0; k <= 8; k++)
         {
-            var y = paddingTop + plotH * (i / 4.0);
+            var y = paddingTop + plotH * (1.0 - (k / 8.0));
+            var isMajor = k % 2 == 0;
             var grid = new Line
             {
                 X1 = paddingLeft,
                 X2 = paddingLeft + plotW,
                 Y1 = y,
                 Y2 = y,
-                Stroke = gridBrush,
-                StrokeThickness = 1
+                Stroke = isMajor ? gridBrush : gridBrushMinor,
+                StrokeThickness = isMajor ? 1 : 0.75
             };
             LineChartCanvas.Children.Add(grid);
 
-            var yLabel = new TextBlock
+            if (isMajor)
             {
-                Text = (5 - i).ToString(),
-                Foreground = (Brush)Application.Current.Resources["Brush.TextMuted"],
-                FontSize = 12
-            };
-            Canvas.SetLeft(yLabel, 10);
-            Canvas.SetTop(yLabel, y - 8);
-            LineChartCanvas.Children.Add(yLabel);
+                var level = 1 + (k / 2);
+                var yLabel = new TextBlock
+                {
+                    Text = level.ToString(),
+                    Foreground = (Brush)Application.Current.Resources["Brush.TextMuted"],
+                    FontSize = 12
+                };
+                Canvas.SetLeft(yLabel, 10);
+                Canvas.SetTop(yLabel, y - 8);
+                LineChartCanvas.Children.Add(yLabel);
+            }
         }
 
         var n = Math.Max(2, series.Length);
         var maxXTicks = 7;
         var xStep = Math.Max(1, (int)Math.Ceiling(n / (double)maxXTicks));
+
+        // Вертикальные тонкие линии для коротких серий, чтобы было легче видеть динамику
+        if (n <= 20)
+        {
+            for (var i = 0; i < n; i++)
+            {
+                var x = paddingLeft + plotW * (i / (double)(n - 1));
+                var vLine = new Line
+                {
+                    X1 = x,
+                    X2 = x,
+                    Y1 = paddingTop,
+                    Y2 = paddingTop + plotH,
+                    Stroke = gridBrushMinor,
+                    StrokeThickness = 1
+                };
+                LineChartCanvas.Children.Add(vLine);
+            }
+        }
+
         for (var i = 0; i < n; i += xStep)
         {
             var x = paddingLeft + plotW * (i / (double)(n - 1));
@@ -323,26 +353,55 @@ public partial class StatisticsView : UserControl
             return new Point(x, y);
         }
 
-        var polyline = new Polyline
-        {
-            Stroke = lineBrush,
-            StrokeThickness = 3,
-            StrokeLineJoin = PenLineJoin.Round
-        };
-
+        // Сглаженная линия: Path с Bezier-сегментами (Catmull-Rom → Bezier)
+        var points = new List<Point>(series.Length);
         for (var i = 0; i < series.Length; i++)
         {
-            polyline.Points.Add(Map(i, series[i]));
+            points.Add(Map(i, series[i]));
         }
-        LineChartCanvas.Children.Add(polyline);
+
+        if (points.Count >= 2)
+        {
+            static Point C1(Point p0, Point p1, Point p2) => new(
+                p1.X + (p2.X - p0.X) / 6.0,
+                p1.Y + (p2.Y - p0.Y) / 6.0
+            );
+
+            static Point C2(Point p1, Point p2, Point p3) => new(
+                p2.X - (p3.X - p1.X) / 6.0,
+                p2.Y - (p3.Y - p1.Y) / 6.0
+            );
+
+            var fig = new PathFigure { StartPoint = points[0], IsClosed = false, IsFilled = false };
+            for (var i = 0; i < points.Count - 1; i++)
+            {
+                var p0 = i == 0 ? points[0] : points[i - 1];
+                var p1 = points[i];
+                var p2 = points[i + 1];
+                var p3 = i + 2 < points.Count ? points[i + 2] : points[^1];
+
+                fig.Segments.Add(new BezierSegment(C1(p0, p1, p2), C2(p1, p2, p3), p2, true));
+            }
+
+            var path = new Path
+            {
+                Data = new PathGeometry(new[] { fig }),
+                Stroke = lineBrush,
+                StrokeThickness = 2.5,
+                StrokeLineJoin = PenLineJoin.Round,
+                StrokeStartLineCap = PenLineCap.Round,
+                StrokeEndLineCap = PenLineCap.Round
+            };
+            LineChartCanvas.Children.Add(path);
+        }
 
         for (var i = 0; i < series.Length; i++)
         {
             var p = Map(i, series[i]);
             var dot = new Ellipse
             {
-                Width = 8,
-                Height = 8,
+                Width = 7,
+                Height = 7,
                 Fill = (Brush)Application.Current.Resources["Brush.Surface"],
                 Stroke = lineBrush,
                 StrokeThickness = 2
@@ -355,6 +414,43 @@ public partial class StatisticsView : UserControl
             Canvas.SetTop(dot, p.Y - dot.Height / 2);
             LineChartCanvas.Children.Add(dot);
         }
+    }
+
+    private void SyncKpis(int[] series)
+    {
+        if (KpiAvgMoodText is null || KpiTrendText is null || KpiMinMaxText is null || KpiPointsText is null)
+        {
+            return;
+        }
+
+        if (series.Length == 0)
+        {
+            KpiAvgMoodText.Text = "—";
+            KpiTrendText.Text = "—";
+            KpiMinMaxText.Text = "—";
+            KpiPointsText.Text = "0";
+            return;
+        }
+
+        var avg = series.Average();
+        var min = series.Min();
+        var max = series.Max();
+
+        var first = series.First();
+        var last = series.Last();
+        var delta = last - first;
+
+        var trend = delta switch
+        {
+            > 0 => $"↑ +{delta}",
+            < 0 => $"↓ {delta}",
+            _ => "→ 0"
+        };
+
+        KpiAvgMoodText.Text = $"{avg:0.0}/5";
+        KpiTrendText.Text = trend;
+        KpiMinMaxText.Text = $"{min}/{max}";
+        KpiPointsText.Text = series.Length.ToString();
     }
 
     private void RenderPieChart()

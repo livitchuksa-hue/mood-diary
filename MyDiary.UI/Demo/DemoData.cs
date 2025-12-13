@@ -63,9 +63,19 @@ public static class DemoData
 
     public static EntryPreview ToPreview(DemoDiaryEntry e)
     {
+        var summary = e.Summary ?? "";
+        if (summary.Length > 140)
+        {
+            summary = summary[..140] + "...";
+        }
+
         return new EntryPreview(
+            Id: Guid.NewGuid(),
+            Date: e.Date,
             Title: e.Title,
-            Summary: e.Summary,
+            Summary: summary,
+            Content: e.Summary,
+            MoodLevel: e.MoodLevel,
             Mood: e.MoodEmoji,
             CreatedAt: e.CreatedAt,
             Activities: e.Activities

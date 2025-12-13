@@ -90,7 +90,7 @@
                                                             <ColumnDefinition Width="Auto" />
                                                         </Grid.ColumnDefinitions>
 
-                                                        <Border Width="44" Height="44" CornerRadius="22" Background="#14000000" VerticalAlignment="Top">
+                                                        <Border Width="44" Height="44" CornerRadius="22" Background="{Binding MoodStatus, Converter={StaticResource MoodStatusToBrushConverter}}" VerticalAlignment="Top">
                                                             <TextBlock Text="{Binding Mood}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" />
                                                         </Border>
 

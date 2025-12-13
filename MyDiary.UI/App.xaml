@@ -33,6 +33,8 @@
         <SolidColorBrush x:Key="Brush.Mood.Good" Color="{StaticResource Color.Mood.Good}" />
         <SolidColorBrush x:Key="Brush.Mood.Great" Color="{StaticResource Color.Mood.Great}" />
 
+        <converters:MoodStatusToBrushConverter x:Key="MoodStatusToBrushConverter" />
+
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
             <Setter Property="FontFamily" Value="Segoe UI" />

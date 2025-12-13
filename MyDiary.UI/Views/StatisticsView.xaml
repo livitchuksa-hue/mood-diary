@@ -51,23 +51,77 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="3*" />
+                        <RowDefinition Height="2*" />
                     </Grid.RowDefinitions>
                     <TextBlock Text="График настроения" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
 
                     <TextBlock x:Name="LineLegendText" Grid.Row="1" Text="" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,10" />
 
-                    <Border Grid.Row="1" Background="{StaticResource Brush.Surface2}" CornerRadius="14" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,26,0,32" Grid.RowSpan="2">
+                    <Border Grid.Row="2" Background="{StaticResource Brush.Surface2}" CornerRadius="14" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,0,0,14" MinHeight="260" ClipToBounds="True">
                         <Canvas x:Name="LineChartCanvas" />
+                    </Border>
+
+                    <Border Grid.Row="3" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="16" MinHeight="220">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Итоги периода" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,12" />
+
+                            <UniformGrid Grid.Row="1" Columns="2" Rows="2">
+                                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,12,12">
+                                    <StackPanel>
+                                        <TextBlock Text="Среднее" Foreground="{StaticResource Brush.TextMuted}" FontSize="13" />
+                                        <TextBlock x:Name="KpiAvgMoodText" Text="—" FontSize="22" FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="Тренд" Foreground="{StaticResource Brush.TextMuted}" FontSize="13" />
+                                        <TextBlock x:Name="KpiTrendText" Text="—" FontSize="22" FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,12,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Мин/Макс" Foreground="{StaticResource Brush.TextMuted}" FontSize="13" />
+                                        <TextBlock x:Name="KpiMinMaxText" Text="—" FontSize="22" FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="12" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Точек" Foreground="{StaticResource Brush.TextMuted}" FontSize="13" />
+                                        <TextBlock x:Name="KpiPointsText" Text="—" FontSize="22" FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+                        </Grid>
                     </Border>
                 </Grid>
             </Border>
 
-            <StackPanel Grid.Column="2" Margin="0,0,0,33">
-                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18" Margin="0,0,0,16">
-                    <StackPanel>
+            <Grid Grid.Column="2" Margin="0,0,0,33">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="2*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18" Margin="0,0,0,16" MinHeight="320">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
                         <TextBlock Text="Эмоции за месяц" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
-                        <Border Background="{StaticResource Brush.Surface2}" CornerRadius="14" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Padding="12">
+
+                        <Border Grid.Row="1" Background="{StaticResource Brush.Surface2}" CornerRadius="14" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Padding="12" Margin="0,0,0,12">
                             <Grid Width="220" Height="220" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Canvas x:Name="PieChartCanvas" Width="220" Height="220" />
                                 <Ellipse Fill="{StaticResource Brush.Surface2}" Width="130" Height="130" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -75,17 +129,26 @@
                             </Grid>
                         </Border>
 
-                        <StackPanel x:Name="PieLegendPanel" Margin="0,12,0,0" />
-                    </StackPanel>
+                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="PieLegendPanel" />
+                        </ScrollViewer>
+                    </Grid>
                 </Border>
 
-                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18">
-                    <StackPanel>
+                <Border Grid.Row="1" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18" MinHeight="220">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
                         <TextBlock Text="Краткое описание" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
-                        <TextBlock Text="Пока это заглушка. Здесь будет текст: какие эмоции встречаются чаще, динамика по неделям, и т.д." TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
-                    </StackPanel>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <TextBlock Text="Пока это заглушка. Здесь будет текст: какие эмоции встречаются чаще, динамика по неделям, и т.д." TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
+                        </ScrollViewer>
+                    </Grid>
                 </Border>
-            </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

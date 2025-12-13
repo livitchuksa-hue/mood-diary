@@ -13,9 +13,9 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Записи" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="EntriesButton_Click" Margin="0,0,10,0" />
-            <Button Grid.Column="1" Content="Статистика" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="StatisticsButton_Click" Margin="0,0,10,0" />
-            <Button Grid.Column="2" Content="Настройки" Style="{StaticResource GhostButton}" Height="44" FontSize="14" Click="SettingsButton_Click" />
+            <Button Grid.Column="0" Content="Записи" Style="{Binding EntriesButtonStyle}" Height="44" FontSize="14" Command="{Binding NavigateEntriesCommand}" Margin="0,0,10,0" />
+            <Button Grid.Column="1" Content="Статистика" Style="{Binding StatisticsButtonStyle}" Height="44" FontSize="14" Command="{Binding NavigateStatisticsCommand}" Margin="0,0,10,0" />
+            <Button Grid.Column="2" Content="Настройки" Style="{Binding SettingsButtonStyle}" Height="44" FontSize="14" Command="{Binding NavigateSettingsCommand}" />
         </Grid>
     </Border>
 </UserControl>
