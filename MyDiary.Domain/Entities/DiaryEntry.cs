@@ -9,4 +9,6 @@ public class DiaryEntry
     public required string Content { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? UpdatedAtUtc { get; set; }
+    public int MoodStatus { get; set; }
+    public List<Activity> Activities { get; set; }
 }

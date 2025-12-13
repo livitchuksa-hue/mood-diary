@@ -3,5 +3,6 @@ namespace MyDiary.Domain.Entities;
 public enum SubscriptionPlan
 {
     Monthly = 1,
-    Yearly = 2
+    HalfEar = 2,
+    Yearly = 3
 }
