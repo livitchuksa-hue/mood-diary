@@ -10,5 +10,5 @@ public class DiaryEntry
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? UpdatedAtUtc { get; set; }
     public int MoodStatus { get; set; }
-    public List<Activity> Activities { get; set; }
+    public List<DiaryEntryActivity> DiaryEntryActivities { get; set; } = new();
 }

@@ -1,5 +1,7 @@
 using System.Windows.Controls;
 using System.Windows;
+using MyDiary.Domain.Entities;
+using MyDiary.Services.Security;
 using MyDiary.UI.Navigation;
 
 namespace MyDiary.UI.Views;
@@ -157,10 +159,52 @@ public partial class RegisterView : UserControl
         }
     }
 
-    private void RegisterButton_Click(object sender, RoutedEventArgs e)
+    private async void RegisterButton_Click(object sender, RoutedEventArgs e)
+{
+    var login = LoginTextBox.Text.Trim();
+    var name = NameTextBox.Text.Trim();
+    var password = PasswordBox.Password;
+
+    var existing = await UiServices.UserRepository.GetByLoginAsync(login);
+    if (existing != null)
     {
-        UiServices.Navigation.Navigate(AppPage.Subscription);
+        ErrorMessageText.Text = "Данный логин уже занят";
+        return;
     }
+    if (password.Length<6)
+    {
+        ErrorMessageText.Text = "Пароль должен содержать минимум 6 символов";
+        return;
+    }
+    if (login.Length<3)
+    {
+        ErrorMessageText.Text = "Логин должен содержать минимум 3 символа";
+        return;
+    }
+    if (name.Length<2)
+    {
+        ErrorMessageText.Text = "Имя должно содержать минимум 2 символы";
+        return;
+    }
+    if (RepeatPasswordBox.Password!=password)
+    {
+        ErrorMessageText.Text = "Пароли должны совпадать";
+        return;
+    }
+
+    var user = new User
+    {
+        Id = Guid.NewGuid(),
+        Login = login,
+        Name = name,
+        PasswordHash = PasswordHasher.Hash(password),
+        CreatedAtUtc = DateTime.UtcNow
+    };
+
+    await UiServices.UserRepository.AddAsync(user);
+
+    UiServices.Navigation.Navigate(AppPage.Subscription);
+}
 
     private void BackButton_Click(object sender, RoutedEventArgs e)
     {

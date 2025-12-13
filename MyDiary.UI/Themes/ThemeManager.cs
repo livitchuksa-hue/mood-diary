@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media;
 
 namespace MyDiary.UI.Themes;
 
@@ -61,41 +60,6 @@ public static class ThemeManager
         }
 
         dictionaries.Insert(0, new ResourceDictionary { Source = targetUri });
-        SyncBrushColors(app.Resources);
         CurrentTheme = theme;
-    }
-
-    private static void SyncBrushColors(ResourceDictionary resources)
-    {
-        SyncBrushColor(resources, "Brush.Background", "Color.Background");
-        SyncBrushColor(resources, "Brush.Surface", "Color.Surface");
-        SyncBrushColor(resources, "Brush.Surface2", "Color.Surface2");
-        SyncBrushColor(resources, "Brush.Border", "Color.Border");
-        SyncBrushColor(resources, "Brush.Text", "Color.Text");
-        SyncBrushColor(resources, "Brush.TextMuted", "Color.TextMuted");
-        SyncBrushColor(resources, "Brush.Accent", "Color.Accent");
-        SyncBrushColor(resources, "Brush.Hover", "Color.Hover");
-        SyncBrushColor(resources, "Brush.AccentSoft", "Color.AccentSoft");
-
-        SyncBrushColor(resources, "Brush.Mood.Bad", "Color.Mood.Bad");
-        SyncBrushColor(resources, "Brush.Mood.Low", "Color.Mood.Low");
-        SyncBrushColor(resources, "Brush.Mood.Mid", "Color.Mood.Mid");
-        SyncBrushColor(resources, "Brush.Mood.Good", "Color.Mood.Good");
-        SyncBrushColor(resources, "Brush.Mood.Great", "Color.Mood.Great");
-    }
-
-    private static void SyncBrushColor(ResourceDictionary resources, string brushKey, string colorKey)
-    {
-        if (resources[brushKey] is not SolidColorBrush brush)
-        {
-            return;
-        }
-
-        if (resources[colorKey] is not Color color)
-        {
-            return;
-        }
-
-        brush.Color = color;
     }
 }

@@ -7,6 +7,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using MyDiary.UI.Models;
+using MyDiary.UI.Properties;
+using MyDiary.UI.Security;
 using MyDiary.UI.Themes;
 
 namespace MyDiary.UI.Views;
@@ -28,6 +30,17 @@ public partial class SettingsView : UserControl
     private void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         SyncLanguageHint();
+
+        if (LanguageCombo?.SelectedIndex == 1)
+        {
+            Settings.Default.Language = "en";
+        }
+        else
+        {
+            Settings.Default.Language = "ru";
+        }
+
+        Settings.Default.Save();
     }
 
     private void SyncLanguageHint()
@@ -50,8 +63,8 @@ public partial class SettingsView : UserControl
             return;
         }
 
-        var theme = ThemeManager.DetectCurrentTheme();
-        ThemeCombo.SelectedIndex = theme == AppTheme.Dark ? 1 : 0;
+        var theme = Settings.Default.Theme;
+        ThemeCombo.SelectedIndex = string.Equals(theme, "dark", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
     }
 
     private static IReadOnlyList<ActivityEditModel> BuildDemoActivities()
@@ -82,11 +95,15 @@ public partial class SettingsView : UserControl
     {
         if (ThemeCombo?.SelectedIndex == 1)
         {
-            ThemeManager.ApplyTheme(AppTheme.Dark);
+            Settings.Default.Theme = "dark";
+            Settings.Default.Save();
+            MessageBox.Show("Тема будет применена после перезапуска приложения");
             return;
         }
 
-        ThemeManager.ApplyTheme(AppTheme.Light);
+        Settings.Default.Theme = "light";
+        Settings.Default.Save();
+        MessageBox.Show("Тема будет применена после перезапуска приложения");
     }
 
     private void ActivityCard_Click(object sender, RoutedEventArgs e)
@@ -105,6 +122,8 @@ public partial class SettingsView : UserControl
 
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
+        UiServices.CurrentUser = null;
+        RememberMeStorage.Clear();
         UiServices.Navigation.Navigate(AppPage.Login);
     }
 }

@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MyDiary.UI.Navigation;
+using MyDiary.UI.Security;
 using MyDiary.UI.ViewModels;
 using MyDiary.UI.Views;
 
@@ -22,6 +23,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        Loaded += MainWindow_Loaded;
+
         UiServices.Navigation = new MyDiary.UI.Navigation.NavigationService(NavigateInternal);
 
         var vm = new MainViewModel(UiServices.Navigation);
@@ -29,6 +32,31 @@ public partial class MainWindow : Window
         TopBar.DataContext = vm;
 
         UiServices.Navigation.Navigate(AppPage.Login);
+    }
+
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (!RememberMeStorage.TryGetRememberedUserId(out var userId))
+        {
+            return;
+        }
+
+        try
+        {
+            var user = await UiServices.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+            {
+                RememberMeStorage.Clear();
+                return;
+            }
+
+            UiServices.CurrentUser = user;
+            UiServices.Navigation.Navigate(AppPage.Entries);
+        }
+        catch
+        {
+            RememberMeStorage.Clear();
+        }
     }
 
     private void NavigateInternal(AppPage page, object? parameter)

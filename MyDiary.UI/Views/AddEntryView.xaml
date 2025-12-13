@@ -119,8 +119,8 @@
                             <TextBlock Text="Эмоция" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" />
                             <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
                                 <UniformGrid Columns="5" Rows="1">
-                                    <RadioButton x:Name="Mood1" GroupName="Mood" Content="😔" Style="{StaticResource MoodTileRadioCompact}" />
-                                    <RadioButton x:Name="Mood2" GroupName="Mood" Content="😣" Style="{StaticResource MoodTileRadioCompact}" />
+                                    <RadioButton x:Name="Mood1" GroupName="Mood" Content="😣" Style="{StaticResource MoodTileRadioCompact}" />
+                                    <RadioButton x:Name="Mood2" GroupName="Mood" Content="😔" Style="{StaticResource MoodTileRadioCompact}" />
                                     <RadioButton x:Name="Mood3" GroupName="Mood" Content="😐" Style="{StaticResource MoodTileRadioCompact}" IsChecked="True" />
                                     <RadioButton x:Name="Mood4" GroupName="Mood" Content="🙂" Style="{StaticResource MoodTileRadioCompact}" />
                                     <RadioButton x:Name="Mood5" GroupName="Mood" Content="😊" Style="{StaticResource MoodTileRadioCompact}" />
