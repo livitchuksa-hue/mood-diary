@@ -57,13 +57,13 @@
 
                     <TextBlock x:Name="LineLegendText" Grid.Row="1" Text="" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,10" />
 
-                    <Border Grid.Row="2" Background="{StaticResource Brush.Surface2}" CornerRadius="14" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                    <Border Grid.Row="1" Background="{StaticResource Brush.Surface2}" CornerRadius="14" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,26,0,32" Grid.RowSpan="2">
                         <Canvas x:Name="LineChartCanvas" />
                     </Border>
                 </Grid>
             </Border>
 
-            <StackPanel Grid.Column="2">
+            <StackPanel Grid.Column="2" Margin="0,0,0,33">
                 <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="Эмоции за месяц" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
