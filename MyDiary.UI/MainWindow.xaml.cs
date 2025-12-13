@@ -27,7 +27,7 @@ public partial class MainWindow : Window
 
     private void NavigateInternal(AppPage page, object? parameter)
     {
-        TopBar.Visibility = page is AppPage.Statistics or AppPage.Entries or AppPage.AddEntry or AppPage.Settings or AppPage.CreateActivity or AppPage.EntryDetails
+        TopBar.Visibility = page is AppPage.Statistics or AppPage.Entries or AppPage.AddEntry or AppPage.Settings or AppPage.CreateActivity or AppPage.EditActivity or AppPage.EntryDetails
             ? Visibility.Visible
             : Visibility.Collapsed;
 
@@ -44,6 +44,7 @@ public partial class MainWindow : Window
             AppPage.Settings => new SettingsView(),
 
             AppPage.CreateActivity => new CreateActivityView(),
+            AppPage.EditActivity => new EditActivityView(parameter),
 
             AppPage.EntryDetails => new EntryDetailsView(parameter),
             _ => new LoginView()

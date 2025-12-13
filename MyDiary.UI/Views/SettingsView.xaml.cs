@@ -1,8 +1,12 @@
 using MyDiary.UI.Navigation;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
+using MyDiary.UI.Models;
 
 namespace MyDiary.UI.Views;
 
@@ -12,7 +16,11 @@ public partial class SettingsView : UserControl
     {
         InitializeComponent();
 
-        Loaded += (_, _) => SyncLanguageHint();
+        Loaded += (_, _) =>
+        {
+            SyncLanguageHint();
+            RenderActivities();
+        };
     }
 
     private void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -33,26 +41,43 @@ public partial class SettingsView : UserControl
         }
     }
 
+    private static IReadOnlyList<ActivityEditModel> BuildDemoActivities()
+    {
+        return new List<ActivityEditModel>
+        {
+            new("Спорт", "Тренировка, пробежка, прогулка."),
+            new("Музыка", "Слушал музыку или играл на инструменте."),
+            new("Спорт", "Тренировка, пробежка, прогулка."),
+            new("Музыка", "Слушал музыку или играл на инструменте."),
+            new("Спорт", "Тренировка, пробежка, прогулка."),
+            new("Музыка", "Слушал музыку или играл на инструменте."),
+            new("Спорт", "Тренировка, пробежка, прогулка."),
+            new("Музыка", "Слушал музыку или играл на инструменте."),
+            new("Спорт", "Тренировка, пробежка, прогулка."),
+            new("Музыка", "Слушал музыку или играл на инструменте.")
+        };
+    }
+
     private void RenderActivities()
     {
-        var Activities = 0;
-        var rows = 1;
-        for (int i = 0; i <= Activities; i++)
+        var activities = BuildDemoActivities();
+
+        if (ActivitiesList is null)
         {
-            if (i % 10 == 0) rows++;
+            return;
         }
-        ActivityGrid.Rows = rows;
-        for (int i = 0; i <= Activities; i++) 
+
+        ActivitiesList.ItemsSource = activities;
+    }
+
+    private void ActivityCard_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: ActivityEditModel activity })
         {
-            var border = new Border
-            {
-                CornerRadius = new CornerRadius(10),
-                Background = (Brush)Application.Current.Resources["Brush.Surface2"],
-                BorderBrush = cellBorder,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(4)
-            };
+            return;
         }
+
+        UiServices.Navigation.Navigate(AppPage.EditActivity, activity);
     }
     private void CreateActivityButton_Click(object sender, RoutedEventArgs e)
     {
