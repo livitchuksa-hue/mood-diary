@@ -113,7 +113,7 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.Column="2" Margin="0,0,0,33">
+            <Grid Grid.Column="2" Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="3*" />
                     <RowDefinition Height="2*" />
@@ -156,9 +156,9 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Краткий анализ" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <TextBlock Text="Краткое описание" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                            <TextBlock Text="Пока анализа нет — он появится, когда у вас будут записи. Здесь будет краткий вывод: какие эмоции встречаются чаще, общий тренд и динамика по периоду." TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
+                            <TextBlock Text="Пока это заглушка. Здесь будет текст: какие эмоции встречаются чаще, динамика по неделям, и т.д." TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
                         </ScrollViewer>
                     </Grid>
                 </Border>

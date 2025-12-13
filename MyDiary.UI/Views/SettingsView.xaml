@@ -30,6 +30,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -44,6 +45,16 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Margin="0,18,0,0">
+                        <TextBlock Text="Тема" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <TextBlock Text="Выбери оформление приложения и нажми «Применить»" Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                        <ComboBox x:Name="ThemeCombo" Height="44">
+                            <ComboBoxItem Content="Светлая" />
+                            <ComboBoxItem Content="Тёмная" />
+                        </ComboBox>
+                        <Button Content="Применить" Style="{StaticResource PrimaryButton}" Margin="0,12,0,0" Click="ApplyThemeButton_Click" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Margin="0,18,0,0">
                         <TextBlock Text="Кастомная активность" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
                         <TextBlock Text="Добавь свою активность (пока только UI)" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,10" />
 
@@ -58,9 +69,9 @@
                         <Button Content="Создать активность" Style="{StaticResource PrimaryButton}" Margin="0,12,0,0" Click="CreateActivityButton_Click" />
                     </StackPanel>
 
-                    <TextBlock Grid.Row="2" Text="Активности" FontSize="16" FontWeight="SemiBold" Margin="0,18,0,10" />
+                    <TextBlock Grid.Row="3" Text="Активности" FontSize="16" FontWeight="SemiBold" Margin="0,18,0,10" />
 
-                    <Border Grid.Row="3" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
+                    <Border Grid.Row="4" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
                         <Grid>
                             <ScrollViewer x:Name="ActivitiesScrollViewer" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
                                 <ItemsControl x:Name="ActivitiesList">

@@ -1,4 +1,4 @@
-<UserControl x:Class="MyDiary.UI.Views.AddEntryView"
+<UserControl x:Class="MyDiary.UI.Views.EditEntryView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -22,7 +22,6 @@
             <Setter Property="Padding" Value="14,10" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="MinHeight" Value="44" />
-            <Setter Property="MinWidth" Value="140" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -67,8 +66,8 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel>
-                <TextBlock x:Name="HeaderText" Text="Создать запись" FontSize="22" FontWeight="SemiBold" />
-                <TextBlock Text="Заполни основные данные и нажми Применить" Foreground="{StaticResource Brush.TextMuted}" />
+                <TextBlock Text="Изменить запись" FontSize="22" FontWeight="SemiBold" />
+                <TextBlock Text="Измени данные и нажми Применить" Foreground="{StaticResource Brush.TextMuted}" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
@@ -121,7 +120,7 @@
                                 <UniformGrid Columns="5" Rows="1">
                                     <RadioButton x:Name="Mood1" GroupName="Mood" Content="😔" Style="{StaticResource MoodTileRadioCompact}" />
                                     <RadioButton x:Name="Mood2" GroupName="Mood" Content="😣" Style="{StaticResource MoodTileRadioCompact}" />
-                                    <RadioButton x:Name="Mood3" GroupName="Mood" Content="😐" Style="{StaticResource MoodTileRadioCompact}" IsChecked="True" />
+                                    <RadioButton x:Name="Mood3" GroupName="Mood" Content="😐" Style="{StaticResource MoodTileRadioCompact}" />
                                     <RadioButton x:Name="Mood4" GroupName="Mood" Content="🙂" Style="{StaticResource MoodTileRadioCompact}" />
                                     <RadioButton x:Name="Mood5" GroupName="Mood" Content="😊" Style="{StaticResource MoodTileRadioCompact}" />
                                 </UniformGrid>
@@ -132,6 +131,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <TextBlock Text="Активности" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" />
@@ -160,12 +160,14 @@
                                     </Border>
                                 </Grid>
                             </Border>
+
+                            <Button x:Name="DeleteActivitiesButton" Grid.Row="2" Content="Удалить активность" Style="{StaticResource GhostButton}" Margin="0,12,0,0" Click="DeleteActivitiesButton_Click" Visibility="Collapsed" />
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
         </Border>
 
-        <TextBlock Grid.Row="2" Text="Пока это только UI: данные не сохраняются. Кнопка Применить вернёт на Записи." Foreground="{StaticResource Brush.TextMuted}" Margin="0,16,0,0" />
+        <TextBlock Grid.Row="2" Text="Пока это только UI: данные сохраняются в демо-хранилище AppData." Foreground="{StaticResource Brush.TextMuted}" Margin="0,16,0,0" />
     </Grid>
 </UserControl>

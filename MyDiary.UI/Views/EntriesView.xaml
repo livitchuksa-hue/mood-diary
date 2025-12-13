@@ -107,7 +107,7 @@
                                                                         </ItemsControl.ItemsPanel>
                                                                         <ItemsControl.ItemTemplate>
                                                                             <DataTemplate>
-                                                                                <Border Background="#14000000" CornerRadius="10" Padding="8,4" Margin="0,0,8,0">
+                                                                                <Border Background="{StaticResource Brush.Hover}" CornerRadius="10" Padding="8,4" Margin="0,0,8,0">
                                                                                     <TextBlock Text="{Binding}" Foreground="{StaticResource Brush.TextMuted}" />
                                                                                 </Border>
                                                                             </DataTemplate>

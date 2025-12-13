@@ -6,6 +6,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1200"
              Background="{StaticResource Brush.Background}">
+    <UserControl.Resources>
+        <Style x:Key="MoodTileRadioCompact" TargetType="RadioButton" BasedOn="{StaticResource MoodTileRadio}">
+            <Setter Property="Width" Value="52" />
+            <Setter Property="Height" Value="52" />
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+    </UserControl.Resources>
+
     <Grid Margin="22">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -13,24 +22,115 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-            <Border Width="44" Height="44" CornerRadius="22" Background="{StaticResource Brush.Accent}" Margin="0,0,12,0" />
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
             <StackPanel>
                 <TextBlock x:Name="TitleText" Text="Запись" FontSize="22" FontWeight="SemiBold" />
                 <TextBlock x:Name="MetaText" Text="" Foreground="{StaticResource Brush.TextMuted}" />
             </StackPanel>
-        </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Content="Назад" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="BackButton_Click" />
+                <Button Content="Изменить" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="EditButton_Click" />
+                <Button Content="Удалить" Style="{StaticResource PrimaryButton}" Click="DeleteButton_Click" />
+            </StackPanel>
+        </Grid>
 
         <Border Grid.Row="1" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="16" Padding="18">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <TextBlock x:Name="ContentText" TextWrapping="Wrap" FontSize="14" />
-            </ScrollViewer>
-        </Border>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Content="Назад" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="BackButton_Click" />
-            <Button Content="Изменить" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="EditButton_Click" />
-            <Button Content="Удалить" Style="{StaticResource PrimaryButton}" Click="DeleteButton_Click" />
-        </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="Название" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <TextBox x:Name="TitleBox" Height="44" Padding="12" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" IsReadOnly="True" />
+                </StackPanel>
+
+                <Grid Grid.Row="1" Margin="0,18,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="420" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Описание" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" />
+                        <Border Grid.Row="1" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
+                            <TextBox x:Name="ContentBox" Padding="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                                     Background="Transparent" BorderThickness="0" IsReadOnly="True" />
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Text="Эмоция" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" />
+                            <Border Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
+                                <UniformGrid Columns="5" Rows="1">
+                                    <RadioButton x:Name="Mood1" GroupName="Mood" Content="😔" Style="{StaticResource MoodTileRadioCompact}" IsEnabled="False" />
+                                    <RadioButton x:Name="Mood2" GroupName="Mood" Content="😣" Style="{StaticResource MoodTileRadioCompact}" IsEnabled="False" />
+                                    <RadioButton x:Name="Mood3" GroupName="Mood" Content="😐" Style="{StaticResource MoodTileRadioCompact}" IsEnabled="False" />
+                                    <RadioButton x:Name="Mood4" GroupName="Mood" Content="🙂" Style="{StaticResource MoodTileRadioCompact}" IsEnabled="False" />
+                                    <RadioButton x:Name="Mood5" GroupName="Mood" Content="😊" Style="{StaticResource MoodTileRadioCompact}" IsEnabled="False" />
+                                </UniformGrid>
+                            </Border>
+                        </StackPanel>
+
+                        <Grid Grid.Row="1" Margin="0,18,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Активности" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" />
+                            <Border Grid.Row="1" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
+                                <Grid>
+                                    <ScrollViewer x:Name="ActivitiesScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl x:Name="ActivitiesList">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Style="{StaticResource GhostButton}" BorderThickness="0" Padding="0" Margin="0,0,0,12" Click="ActivityCard_Click" Tag="{Binding}" HorizontalContentAlignment="Stretch">
+                                                        <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="14">
+                                                            <TextBlock Text="{Binding}" FontWeight="SemiBold" />
+                                                        </Border>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+
+                                    <Border x:Name="ActivitiesEmptyStatePanel" Background="{StaticResource Brush.Surface2}" Visibility="Collapsed">
+                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="320">
+                                            <TextBlock Text="Активности не выбраны" FontSize="16" FontWeight="SemiBold" TextAlignment="Center" />
+                                            <TextBlock Text="В этой записи нет выбранных активностей." Margin="0,6,0,0" Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" TextAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

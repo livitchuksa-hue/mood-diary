@@ -5,33 +5,26 @@
              xmlns:local="clr-namespace:MyDiary.UI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Color x:Key="Color.Background">#F5F7FB</Color>
-        <Color x:Key="Color.Surface">#FFFFFF</Color>
-        <Color x:Key="Color.Surface2">#F0F3FA</Color>
-        <Color x:Key="Color.Border">#D7DDEA</Color>
-        <Color x:Key="Color.Text">#111827</Color>
-        <Color x:Key="Color.TextMuted">#6B7280</Color>
-        <Color x:Key="Color.Accent">#14B8A6</Color>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/LightTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <Color x:Key="Color.Mood.Bad">#EF4444</Color>
-        <Color x:Key="Color.Mood.Low">#F97316</Color>
-        <Color x:Key="Color.Mood.Mid">#FACC15</Color>
-        <Color x:Key="Color.Mood.Good">#A3E635</Color>
-        <Color x:Key="Color.Mood.Great">#16A34A</Color>
+            <SolidColorBrush x:Key="Brush.Background" Color="{DynamicResource Color.Background}" />
+            <SolidColorBrush x:Key="Brush.Surface" Color="{DynamicResource Color.Surface}" />
+            <SolidColorBrush x:Key="Brush.Surface2" Color="{DynamicResource Color.Surface2}" />
+            <SolidColorBrush x:Key="Brush.Border" Color="{DynamicResource Color.Border}" />
+            <SolidColorBrush x:Key="Brush.Text" Color="{DynamicResource Color.Text}" />
+            <SolidColorBrush x:Key="Brush.TextMuted" Color="{DynamicResource Color.TextMuted}" />
+            <SolidColorBrush x:Key="Brush.Accent" Color="{DynamicResource Color.Accent}" />
+            <SolidColorBrush x:Key="Brush.Hover" Color="{DynamicResource Color.Hover}" />
+            <SolidColorBrush x:Key="Brush.AccentSoft" Color="{DynamicResource Color.AccentSoft}" />
 
-        <SolidColorBrush x:Key="Brush.Background" Color="{StaticResource Color.Background}" />
-        <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}" />
-        <SolidColorBrush x:Key="Brush.Surface2" Color="{StaticResource Color.Surface2}" />
-        <SolidColorBrush x:Key="Brush.Border" Color="{StaticResource Color.Border}" />
-        <SolidColorBrush x:Key="Brush.Text" Color="{StaticResource Color.Text}" />
-        <SolidColorBrush x:Key="Brush.TextMuted" Color="{StaticResource Color.TextMuted}" />
-        <SolidColorBrush x:Key="Brush.Accent" Color="{StaticResource Color.Accent}" />
-
-        <SolidColorBrush x:Key="Brush.Mood.Bad" Color="{StaticResource Color.Mood.Bad}" />
-        <SolidColorBrush x:Key="Brush.Mood.Low" Color="{StaticResource Color.Mood.Low}" />
-        <SolidColorBrush x:Key="Brush.Mood.Mid" Color="{StaticResource Color.Mood.Mid}" />
-        <SolidColorBrush x:Key="Brush.Mood.Good" Color="{StaticResource Color.Mood.Good}" />
-        <SolidColorBrush x:Key="Brush.Mood.Great" Color="{StaticResource Color.Mood.Great}" />
+            <SolidColorBrush x:Key="Brush.Mood.Bad" Color="{DynamicResource Color.Mood.Bad}" />
+            <SolidColorBrush x:Key="Brush.Mood.Low" Color="{DynamicResource Color.Mood.Low}" />
+            <SolidColorBrush x:Key="Brush.Mood.Mid" Color="{DynamicResource Color.Mood.Mid}" />
+            <SolidColorBrush x:Key="Brush.Mood.Good" Color="{DynamicResource Color.Mood.Good}" />
+            <SolidColorBrush x:Key="Brush.Mood.Great" Color="{DynamicResource Color.Mood.Great}" />
 
         <converters:MoodStatusToBrushConverter x:Key="MoodStatusToBrushConverter" />
 
@@ -108,7 +101,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#0A000000" />
+                                <Setter Property="Background" Value="{StaticResource Brush.Hover}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.45" />
@@ -145,10 +138,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#0A000000" />
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.Hover}" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#1A14B8A6" />
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.AccentSoft}" />
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource Brush.Accent}" />
                                 <Setter TargetName="Root" Property="BorderThickness" Value="2" />
                             </Trigger>
@@ -184,10 +177,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#0A000000" />
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.Hover}" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#1A14B8A6" />
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.AccentSoft}" />
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource Brush.Accent}" />
                                 <Setter TargetName="Root" Property="BorderThickness" Value="2" />
                             </Trigger>
@@ -199,5 +192,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

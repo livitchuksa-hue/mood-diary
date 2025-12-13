@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using MyDiary.UI.Models;
+using MyDiary.UI.Themes;
 
 namespace MyDiary.UI.Views;
 
@@ -19,6 +20,7 @@ public partial class SettingsView : UserControl
         Loaded += (_, _) =>
         {
             SyncLanguageHint();
+            SyncThemeCombo();
             RenderActivities();
         };
     }
@@ -39,6 +41,17 @@ public partial class SettingsView : UserControl
         {
             ActivityHint.Text = $"Выбран язык: {item.Content}";
         }
+    }
+
+    private void SyncThemeCombo()
+    {
+        if (ThemeCombo is null)
+        {
+            return;
+        }
+
+        var theme = ThemeManager.DetectCurrentTheme();
+        ThemeCombo.SelectedIndex = theme == AppTheme.Dark ? 1 : 0;
     }
 
     private static IReadOnlyList<ActivityEditModel> BuildDemoActivities()
@@ -63,6 +76,17 @@ public partial class SettingsView : UserControl
         {
             ActivitiesEmptyStatePanel.Visibility = activities.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
+    }
+
+    private void ApplyThemeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (ThemeCombo?.SelectedIndex == 1)
+        {
+            ThemeManager.ApplyTheme(AppTheme.Dark);
+            return;
+        }
+
+        ThemeManager.ApplyTheme(AppTheme.Light);
     }
 
     private void ActivityCard_Click(object sender, RoutedEventArgs e)

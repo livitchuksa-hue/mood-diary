@@ -14,5 +14,7 @@ public enum AppPage
     CreateActivity = 15,
     EditActivity = 16,
 
+    EditEntry = 19,
+
     EntryDetails = 20
 }

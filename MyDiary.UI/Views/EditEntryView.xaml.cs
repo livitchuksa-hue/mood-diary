@@ -1,17 +1,17 @@
 using System;
-using System.Windows;
-using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
+using MyDiary.UI;
 using MyDiary.UI.Models;
 using MyDiary.UI.Navigation;
-using MyDiary.UI;
 
 namespace MyDiary.UI.Views;
 
-public partial class AddEntryView : UserControl
+public partial class EditEntryView : UserControl
 {
     private sealed class ActivitySelectionItem : INotifyPropertyChanged
     {
@@ -50,17 +50,11 @@ public partial class AddEntryView : UserControl
     private readonly EntryPreview? _editing;
     private readonly ObservableCollection<ActivitySelectionItem> _activities = new();
 
-    public AddEntryView(object? parameter)
+    public EditEntryView(object? parameter)
     {
         InitializeComponent();
 
         _editing = parameter as EntryPreview;
-        HeaderText.Text = _editing is null ? "Создать запись" : "Изменить запись";
-
-        if (ActivitiesList is not null)
-        {
-            ActivitiesList.ItemsSource = _activities;
-        }
 
         if (_editing is not null)
         {
@@ -69,11 +63,17 @@ public partial class AddEntryView : UserControl
             SetMood(_editing.MoodLevel);
         }
 
+        if (ActivitiesList is not null)
+        {
+            ActivitiesList.ItemsSource = _activities;
+        }
+
         Loaded += (_, _) =>
         {
             LoadActivities();
             RestoreSelectedActivities();
             SyncActivitiesEmptyState();
+            SyncDeleteButton();
         };
     }
 
@@ -83,7 +83,9 @@ public partial class AddEntryView : UserControl
 
         foreach (var a in AppData.GetAllActivities())
         {
-            _activities.Add(new ActivitySelectionItem(a));
+            var item = new ActivitySelectionItem(a);
+            item.PropertyChanged += (_, _) => SyncDeleteButton();
+            _activities.Add(item);
         }
     }
 
@@ -114,6 +116,16 @@ public partial class AddEntryView : UserControl
         ActivitiesEmptyStatePanel.Visibility = _activities.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private void SyncDeleteButton()
+    {
+        if (DeleteActivitiesButton is null)
+        {
+            return;
+        }
+
+        DeleteActivitiesButton.Visibility = _activities.Any(a => a.IsSelected) ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     private void SetMood(int moodLevel)
     {
         Mood1.IsChecked = moodLevel == 1;
@@ -128,31 +140,6 @@ public partial class AddEntryView : UserControl
         }
     }
 
-    private void BackButton_Click(object sender, RoutedEventArgs e)
-    {
-        UiServices.Navigation.Navigate(AppPage.Entries);
-    }
-
-    private void ApplyButton_Click(object sender, RoutedEventArgs e)
-    {
-        var date = _editing?.Date ?? DateOnly.FromDateTime(System.DateTime.Today);
-        var title = TitleBox?.Text ?? "";
-        var content = ContentBox?.Text ?? "";
-        var moodLevel = GetSelectedMoodLevel();
-        var activities = _activities.Where(a => a.IsSelected).Select(a => a.Name).ToList();
-
-        if (_editing is null)
-        {
-            AppData.AddEntry(date, title, moodLevel, activities, content);
-        }
-        else
-        {
-            AppData.UpdateEntry(_editing.Id, date, title, moodLevel, activities, content);
-        }
-
-        UiServices.Navigation.Navigate(AppPage.Entries);
-    }
-
     private int GetSelectedMoodLevel()
     {
         if (Mood1.IsChecked == true) return 1;
@@ -164,14 +151,39 @@ public partial class AddEntryView : UserControl
         return 3;
     }
 
-    private string GetSelectedMoodEmoji()
+    private void BackButton_Click(object sender, RoutedEventArgs e)
     {
-        if (Mood1.IsChecked == true) return "😔";
-        if (Mood2.IsChecked == true) return "😣";
-        if (Mood3.IsChecked == true) return "😐";
-        if (Mood4.IsChecked == true) return "🙂";
-        if (Mood5.IsChecked == true) return "😊";
+        UiServices.Navigation.Navigate(AppPage.EntryDetails, _editing);
+    }
 
-        return "😐";
+    private void ApplyButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_editing is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Entries);
+            return;
+        }
+
+        var date = _editing.Date;
+        var title = TitleBox?.Text ?? "";
+        var content = ContentBox?.Text ?? "";
+        var moodLevel = GetSelectedMoodLevel();
+        var activities = _activities.Where(a => a.IsSelected).Select(a => a.Name).ToList();
+
+        AppData.UpdateEntry(_editing.Id, date, title, moodLevel, activities, content);
+        UiServices.Navigation.Navigate(AppPage.EntryDetails, AppData.GetPreviewById(_editing.Id) ?? _editing);
+    }
+
+    private void DeleteActivitiesButton_Click(object sender, RoutedEventArgs e)
+    {
+        foreach (var item in _activities)
+        {
+            if (item.IsSelected)
+            {
+                item.IsSelected = false;
+            }
+        }
+
+        SyncDeleteButton();
     }
 }
