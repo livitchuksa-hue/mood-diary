@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using MyDiary.UI.Demo;
+using MyDiary.UI;
 using MyDiary.UI.Models;
 using MyDiary.UI.Navigation;
 
@@ -25,8 +25,6 @@ public partial class EntriesView : UserControl
     {
         InitializeComponent();
 
-        _minMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(-2);
-
         EntriesList.ItemsSource = _items;
         InitializeFilters();
         UpdateHeader();
@@ -41,7 +39,7 @@ public partial class EntriesView : UserControl
 
     private void RenderEntries()
     {
-        var entries = DemoData.GetEntriesForMonth(_monthCursor);
+        var entries = AppData.GetEntryPreviewsForMonth(_monthCursor);
 
         if (_moodLevelFilter.HasValue)
         {
@@ -56,7 +54,12 @@ public partial class EntriesView : UserControl
         _items.Clear();
         foreach (var e in entries)
         {
-            _items.Add(DemoData.ToPreview(e));
+            _items.Add(e);
+        }
+
+        if (EntriesEmptyStatePanel is not null)
+        {
+            EntriesEmptyStatePanel.Visibility = _items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
@@ -86,7 +89,7 @@ public partial class EntriesView : UserControl
 
         var prev = keepSelection ? _activityFilter : null;
 
-        var activities = DemoData.GetEntriesForMonth(_monthCursor)
+        var activities = AppData.GetEntryPreviewsForMonth(_monthCursor)
             .SelectMany(e => e.Activities)
             .Where(a => !string.IsNullOrWhiteSpace(a))
             .Distinct()
@@ -168,7 +171,7 @@ public partial class EntriesView : UserControl
             var date = start.AddDays(i);
             var isCurrentMonth = date.Month == firstOfMonth.Month;
 
-            var moodLevel = DemoData.GetMoodLevel(date);
+            var moodLevel = AppData.GetMoodLevel(date);
             var moodBrush = moodLevel == 0 ? (Brush)Application.Current.Resources["Brush.Surface"] : MoodBrush(moodLevel);
 
             var cellBackground = moodLevel == 0
@@ -223,11 +226,11 @@ public partial class EntriesView : UserControl
             return;
         }
 
-        var monthEntries = DemoData.GetEntriesForMonth(_monthCursor);
+        var monthEntries = AppData.GetEntryPreviewsForMonth(_monthCursor);
         var first = monthEntries.FirstOrDefault(x => x.Date == date);
         if (first is not null)
         {
-            UiServices.Navigation.Navigate(AppPage.EntryDetails, DemoData.ToPreview(first));
+            UiServices.Navigation.Navigate(AppPage.EntryDetails, first);
             return;
         }
 

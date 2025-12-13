@@ -2,7 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using MyDiary.UI.Demo;
+using MyDiary.UI;
 
 namespace MyDiary.UI.Views;
 
@@ -105,7 +105,7 @@ public partial class CalendarView : UserControl
             var date = start.AddDays(i);
             var isCurrentMonth = date.Month == firstOfMonth.Month;
 
-            var moodLevel = DemoData.GetMoodLevel(date);
+            var moodLevel = AppData.GetMoodLevel(date);
             var mood = moodLevel == 0 ? (Brush)Application.Current.Resources["Brush.Surface"] : MoodBrush(moodLevel);
 
             var cellBackground = moodLevel == 0

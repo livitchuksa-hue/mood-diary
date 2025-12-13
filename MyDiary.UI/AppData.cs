@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MyDiary.UI.Demo;
 using MyDiary.UI.Models;
 
 namespace MyDiary.UI;
@@ -19,18 +18,7 @@ public static class AppData
         public string[] Activities { get; set; } = Array.Empty<string>();
     }
 
-    private static readonly List<AppDiaryEntry> _entries = DemoData.Entries
-        .Select(e => new AppDiaryEntry
-        {
-            Id = Guid.NewGuid(),
-            Date = e.Date,
-            CreatedAt = e.CreatedAt,
-            Title = e.Title,
-            Content = e.Summary,
-            MoodLevel = e.MoodLevel,
-            Activities = e.Activities
-        })
-        .ToList();
+    private static readonly List<AppDiaryEntry> _entries = new();
 
     private static readonly HashSet<string> _customActivities = new(StringComparer.OrdinalIgnoreCase);
 
@@ -82,6 +70,14 @@ public static class AppData
             .Where(e => e.Date == day)
             .OrderByDescending(e => e.CreatedAt)
             .Select(ToPreview)
+            .ToList();
+    }
+
+    public static IReadOnlyList<(DateOnly Date, int MoodLevel)> GetMoodEntries(DateOnly start, DateOnly end)
+    {
+        return _entries
+            .Where(e => e.Date >= start && e.Date <= end)
+            .Select(e => (e.Date, e.MoodLevel))
             .ToList();
     }
 

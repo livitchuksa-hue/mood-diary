@@ -76,53 +76,62 @@
                         </StackPanel>
 
                         <Border Grid.Row="2" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="10">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                <ItemsControl x:Name="EntriesList">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Button Style="{StaticResource GhostButton}" BorderThickness="0" Padding="0" Margin="0,0,0,10" Click="EntryButton_Click" Tag="{Binding}" HorizontalContentAlignment="Stretch">
-                                                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="14" Height="120" HorizontalAlignment="Stretch">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="12" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
+                            <Grid>
+                                <ScrollViewer x:Name="EntriesScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <ItemsControl x:Name="EntriesList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource GhostButton}" BorderThickness="0" Padding="0" Margin="0,0,0,10" Click="EntryButton_Click" Tag="{Binding}" HorizontalContentAlignment="Stretch">
+                                                    <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="14" Height="120" HorizontalAlignment="Stretch">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="12" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
 
-                                                        <Border Width="44" Height="44" CornerRadius="22" Background="{Binding MoodStatus, Converter={StaticResource MoodStatusToBrushConverter}}" VerticalAlignment="Top">
-                                                            <TextBlock Text="{Binding Mood}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" />
-                                                        </Border>
+                                                            <Border Width="44" Height="44" CornerRadius="22" Background="{Binding MoodStatus, Converter={StaticResource MoodStatusToBrushConverter}}" VerticalAlignment="Top">
+                                                                <TextBlock Text="{Binding Mood}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" />
+                                                            </Border>
 
-                                                        <StackPanel Grid.Column="2">
-                                                            <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" />
-                                                            <TextBlock Text="{Binding Summary}" Foreground="{StaticResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" MaxHeight="42" TextWrapping="Wrap" />
-                                                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                                                <ItemsControl ItemsSource="{Binding Activities}">
-                                                                    <ItemsControl.ItemsPanel>
-                                                                        <ItemsPanelTemplate>
-                                                                            <StackPanel Orientation="Horizontal" />
-                                                                        </ItemsPanelTemplate>
-                                                                    </ItemsControl.ItemsPanel>
-                                                                    <ItemsControl.ItemTemplate>
-                                                                        <DataTemplate>
-                                                                            <Border Background="#14000000" CornerRadius="10" Padding="8,4" Margin="0,0,8,0">
-                                                                                <TextBlock Text="{Binding}" Foreground="{StaticResource Brush.TextMuted}" />
-                                                                            </Border>
-                                                                        </DataTemplate>
-                                                                    </ItemsControl.ItemTemplate>
-                                                                </ItemsControl>
+                                                            <StackPanel Grid.Column="2">
+                                                                <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" />
+                                                                <TextBlock Text="{Binding Summary}" Foreground="{StaticResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" MaxHeight="42" TextWrapping="Wrap" />
+                                                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                                                    <ItemsControl ItemsSource="{Binding Activities}">
+                                                                        <ItemsControl.ItemsPanel>
+                                                                            <ItemsPanelTemplate>
+                                                                                <StackPanel Orientation="Horizontal" />
+                                                                            </ItemsPanelTemplate>
+                                                                        </ItemsControl.ItemsPanel>
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <Border Background="#14000000" CornerRadius="10" Padding="8,4" Margin="0,0,8,0">
+                                                                                    <TextBlock Text="{Binding}" Foreground="{StaticResource Brush.TextMuted}" />
+                                                                                </Border>
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                </StackPanel>
                                                             </StackPanel>
-                                                        </StackPanel>
 
-                                                        <TextBlock Grid.Column="3" Text="{Binding CreatedAt, StringFormat={}{0:dd.MM HH:mm}}" Foreground="{StaticResource Brush.TextMuted}" VerticalAlignment="Top" />
-                                                    </Grid>
-                                                </Border>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
+                                                            <TextBlock Grid.Column="3" Text="{Binding CreatedAt, StringFormat={}{0:dd.MM HH:mm}}" Foreground="{StaticResource Brush.TextMuted}" VerticalAlignment="Top" />
+                                                        </Grid>
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+
+                                <Border x:Name="EntriesEmptyStatePanel" Background="{StaticResource Brush.Surface2}" Visibility="Collapsed">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="340">
+                                        <TextBlock Text="Сейчас здесь пусто" FontSize="18" FontWeight="SemiBold" TextAlignment="Center" />
+                                        <TextBlock Text="Тут будут ваши записи. Чтобы добавить запись, нажмите кнопку «Создать запись»." Margin="0,8,0,0" Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" TextAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
                         </Border>
                     </Grid>
                 </Border>

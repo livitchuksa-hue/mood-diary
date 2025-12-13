@@ -45,16 +45,6 @@ public partial class SettingsView : UserControl
     {
         return new List<ActivityEditModel>
         {
-            new("Спорт", "Тренировка, пробежка, прогулка."),
-            new("Музыка", "Слушал музыку или играл на инструменте."),
-            new("Спорт", "Тренировка, пробежка, прогулка."),
-            new("Музыка", "Слушал музыку или играл на инструменте."),
-            new("Спорт", "Тренировка, пробежка, прогулка."),
-            new("Музыка", "Слушал музыку или играл на инструменте."),
-            new("Спорт", "Тренировка, пробежка, прогулка."),
-            new("Музыка", "Слушал музыку или играл на инструменте."),
-            new("Спорт", "Тренировка, пробежка, прогулка."),
-            new("Музыка", "Слушал музыку или играл на инструменте.")
         };
     }
 
@@ -68,6 +58,11 @@ public partial class SettingsView : UserControl
         }
 
         ActivitiesList.ItemsSource = activities;
+
+        if (ActivitiesEmptyStatePanel is not null)
+        {
+            ActivitiesEmptyStatePanel.Visibility = activities.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 
     private void ActivityCard_Click(object sender, RoutedEventArgs e)

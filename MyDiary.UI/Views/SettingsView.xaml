@@ -61,33 +61,42 @@
                     <TextBlock Grid.Row="2" Text="Активности" FontSize="16" FontWeight="SemiBold" Margin="0,18,0,10" />
 
                     <Border Grid.Row="3" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="12">
-                        <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
-                            <ItemsControl x:Name="ActivitiesList">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="2" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Style="{StaticResource GhostButton}" BorderThickness="0" Padding="0" Margin="0,0,12,12" Click="ActivityCard_Click" Tag="{Binding}" HorizontalContentAlignment="Stretch">
-                                            <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="14" Height="120" HorizontalAlignment="Stretch">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition Height="*" />
-                                                    </Grid.RowDefinitions>
+                        <Grid>
+                            <ScrollViewer x:Name="ActivitiesScrollViewer" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl x:Name="ActivitiesList">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="2" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource GhostButton}" BorderThickness="0" Padding="0" Margin="0,0,12,12" Click="ActivityCard_Click" Tag="{Binding}" HorizontalContentAlignment="Stretch">
+                                                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="14" Height="120" HorizontalAlignment="Stretch">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="*" />
+                                                        </Grid.RowDefinitions>
 
-                                                    <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" />
+                                                        <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" />
 
-                                                    <TextBlock Grid.Row="1" Text="{Binding Description}" Foreground="{StaticResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxHeight="44" />
-                                                </Grid>
-                                            </Border>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                                                        <TextBlock Grid.Row="1" Text="{Binding Description}" Foreground="{StaticResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxHeight="44" />
+                                                    </Grid>
+                                                </Border>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <Border x:Name="ActivitiesEmptyStatePanel" Background="{StaticResource Brush.Surface2}" Visibility="Collapsed">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="380">
+                                    <TextBlock Text="Пока тут пусто" FontSize="18" FontWeight="SemiBold" TextAlignment="Center" />
+                                    <TextBlock Text="Здесь будут ваши активности. Чтобы добавить активность, нажмите кнопку «Создать активность»." Margin="0,8,0,0" Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" TextAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
                     </Border>
                 </Grid>
             </Border>

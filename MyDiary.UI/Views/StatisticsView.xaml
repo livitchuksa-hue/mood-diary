@@ -59,7 +59,15 @@
                     <TextBlock x:Name="LineLegendText" Grid.Row="1" Text="" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,10" />
 
                     <Border Grid.Row="2" Background="{StaticResource Brush.Surface2}" CornerRadius="14" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,0,0,14" MinHeight="260" ClipToBounds="True">
-                        <Canvas x:Name="LineChartCanvas" />
+                        <Grid>
+                            <Canvas x:Name="LineChartCanvas" />
+                            <Border x:Name="LineEmptyStatePanel" Background="{StaticResource Brush.Surface2}" Visibility="Collapsed">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="420">
+                                    <TextBlock Text="Статистики пока нет" FontSize="18" FontWeight="SemiBold" TextAlignment="Center" />
+                                    <TextBlock Text="Как только появятся записи, здесь появятся графики и итоги периода." Margin="0,8,0,0" Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" TextAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
                     </Border>
 
                     <Border Grid.Row="3" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="14" Padding="16" MinHeight="220">
@@ -126,6 +134,12 @@
                                 <Canvas x:Name="PieChartCanvas" Width="220" Height="220" />
                                 <Ellipse Fill="{StaticResource Brush.Surface2}" Width="130" Height="130" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <TextBlock x:Name="PieCenterText" Text="" Foreground="{StaticResource Brush.TextMuted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Border x:Name="PieEmptyStatePanel" Background="{StaticResource Brush.Surface2}" Visibility="Collapsed">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="200">
+                                        <TextBlock Text="Пока пусто" FontSize="16" FontWeight="SemiBold" TextAlignment="Center" />
+                                        <TextBlock Text="Добавь записи — и здесь появится статистика." Margin="0,6,0,0" Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" TextAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
                             </Grid>
                         </Border>
 
@@ -142,9 +156,9 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Краткое описание" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <TextBlock Text="Краткий анализ" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                            <TextBlock Text="Пока это заглушка. Здесь будет текст: какие эмоции встречаются чаще, динамика по неделям, и т.д." TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
+                            <TextBlock Text="Пока анализа нет — он появится, когда у вас будут записи. Здесь будет краткий вывод: какие эмоции встречаются чаще, общий тренд и динамика по периоду." TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
                         </ScrollViewer>
                     </Grid>
                 </Border>

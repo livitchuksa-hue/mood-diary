@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using MyDiary.UI.Demo;
+using MyDiary.UI;
 
 namespace MyDiary.UI.Views;
 
@@ -120,9 +120,7 @@ public partial class StatisticsView : UserControl
 
     private (string Legend, int[] Series, string[] Labels) GetSeries()
     {
-        var filtered = DemoData.Entries
-            .Where(e => e.Date >= _appliedStart && e.Date <= _appliedEnd)
-            .ToList();
+        var filtered = AppData.GetMoodEntries(_appliedStart, _appliedEnd);
 
         if (filtered.Count == 0)
         {
@@ -137,7 +135,7 @@ public partial class StatisticsView : UserControl
         };
     }
 
-    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByDay(IReadOnlyList<DemoDiaryEntry> entries)
+    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByDay(IReadOnlyList<(DateOnly Date, int MoodLevel)> entries)
     {
         var grouped = entries
             .GroupBy(e => e.Date)
@@ -153,7 +151,7 @@ public partial class StatisticsView : UserControl
         );
     }
 
-    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByWeek(IReadOnlyList<DemoDiaryEntry> entries)
+    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByWeek(IReadOnlyList<(DateOnly Date, int MoodLevel)> entries)
     {
         var grouped = entries
             .GroupBy(e => WeekStartMonday(e.Date))
@@ -169,7 +167,7 @@ public partial class StatisticsView : UserControl
         );
     }
 
-    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByMonth(IReadOnlyList<DemoDiaryEntry> entries)
+    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByMonth(IReadOnlyList<(DateOnly Date, int MoodLevel)> entries)
     {
         var grouped = entries
             .GroupBy(e => new DateOnly(e.Date.Year, e.Date.Month, 1))
@@ -223,7 +221,17 @@ public partial class StatisticsView : UserControl
         var (legend, series, labels) = GetSeries();
         LineLegendText.Text = legend;
 
+        if (LineEmptyStatePanel is not null)
+        {
+            LineEmptyStatePanel.Visibility = series.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         SyncKpis(series);
+
+        if (series.Length == 0)
+        {
+            return;
+        }
 
         var w = Math.Max(1, LineChartCanvas.ActualWidth);
         var h = Math.Max(1, LineChartCanvas.ActualHeight);
@@ -457,11 +465,7 @@ public partial class StatisticsView : UserControl
     {
         PieChartCanvas.Children.Clear();
 
-        var entries = DemoData.Entries
-            .Where(e => e.Date >= _appliedStart && e.Date <= _appliedEnd)
-            .ToList();
-
-        var counts = DemoData.CountMoodLevels(entries);
+        var counts = AppData.CountMoodLevels(_appliedStart, _appliedEnd);
         PieLegendPanel.Children.Clear();
 
         var w = Math.Max(1, PieChartCanvas.ActualWidth);
@@ -488,8 +492,17 @@ public partial class StatisticsView : UserControl
         var total = data.Sum(x => x.Value);
         if (total <= 0)
         {
+            if (PieEmptyStatePanel is not null)
+            {
+                PieEmptyStatePanel.Visibility = Visibility.Visible;
+            }
             PieCenterText.Text = "0";
             return;
+        }
+
+        if (PieEmptyStatePanel is not null)
+        {
+            PieEmptyStatePanel.Visibility = Visibility.Collapsed;
         }
 
         var startAngle = -90.0;
