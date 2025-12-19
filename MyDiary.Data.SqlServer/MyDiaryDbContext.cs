@@ -15,6 +15,7 @@ public class MyDiaryDbContext : DbContext
     public DbSet<UserActivity> UserActivities => Set<UserActivity>();
     public DbSet<DiaryEntryActivity> DiaryEntryActivities => Set<DiaryEntryActivity>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -75,6 +76,21 @@ public class MyDiaryDbContext : DbContext
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Plan).HasConversion<int>();
+            entity.HasIndex(x => x.UserId);
+        });
+
+        modelBuilder.Entity<PaymentMethod>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Provider).IsRequired().HasMaxLength(32);
+            entity.Property(x => x.Token).IsRequired().HasMaxLength(256);
+            entity.Property(x => x.Last4).IsRequired().HasMaxLength(4);
+            entity.Property(x => x.Brand).IsRequired().HasMaxLength(32);
+            entity.Property(x => x.CreatedAtUtc).IsRequired();
+            entity.Property(x => x.IsDefault).IsRequired();
+
+            entity.HasIndex(x => x.Token).IsUnique();
             entity.HasIndex(x => x.UserId);
         });
     }

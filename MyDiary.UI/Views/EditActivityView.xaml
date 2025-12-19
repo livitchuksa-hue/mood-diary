@@ -38,12 +38,11 @@
                     <TextBox x:Name="TitleBox" Height="44" Padding="12" Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" />
 
                     <TextBlock Text="Описание" FontSize="14" FontWeight="SemiBold" Margin="0,18,0,8" />
-                    <TextBox x:Name="DescriptionBox" Height="240" Padding="12" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                    <TextBox x:Name="DescriptionBox" Height="540" Padding="12" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
                              Background="{StaticResource Brush.Surface2}" BorderBrush="{StaticResource Brush.Border}" />
                 </StackPanel>
             </ScrollViewer>
         </Border>
 
-        <TextBlock Grid.Row="2" Text="Пока это только UI: данные не сохраняются. Кнопки вернут в Настройки." Foreground="{StaticResource Brush.TextMuted}" Margin="0,16,0,0" />
     </Grid>
 </UserControl>

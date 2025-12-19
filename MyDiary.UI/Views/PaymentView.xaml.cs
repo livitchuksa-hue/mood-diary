@@ -1,6 +1,8 @@
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Input;
+using MyDiary.Domain.Entities;
+using MyDiary.Services.Payments;
 using MyDiary.UI.Models;
 using MyDiary.UI.Navigation;
 
@@ -21,18 +23,24 @@ public partial class PaymentView : UserControl
 
         CardNumberBox.PreviewTextInput += DigitsOnly_PreviewTextInput;
         DataObject.AddPastingHandler(CardNumberBox, DigitsOnly_Pasting);
+        CardNumberBox.KeyDown += CardNumberBox_KeyDown;
+        
 
         CardExpiryMonthBox.PreviewTextInput += DigitsOnly_PreviewTextInput;
         DataObject.AddPastingHandler(CardExpiryMonthBox, DigitsOnly_Pasting);
         CardExpiryMonthBox.TextChanged += CardExpiryMonthBox_TextChanged;
+        CardExpiryMonthBox.PreviewKeyDown += CardExpiryMonthBox_PreviewKeyDown;
         CardExpiryMonthBox.KeyDown += CardExpiryMonthBox_KeyDown;
 
         CardExpiryYearBox.PreviewTextInput += DigitsOnly_PreviewTextInput;
         DataObject.AddPastingHandler(CardExpiryYearBox, DigitsOnly_Pasting);
         CardExpiryYearBox.PreviewKeyDown += CardExpiryYearBox_PreviewKeyDown;
+        CardExpiryYearBox.KeyDown += CardExpiryYearBox_KeyDown;
 
         CardCvcBox.PreviewTextInput += DigitsOnly_PreviewTextInput;
         DataObject.AddPastingHandler(CardCvcBox, DigitsOnly_Pasting);
+        CardCvcBox.PreviewKeyDown += CardCvcBox_PreviewKeyDown;
+        CardCvcBox.KeyDown += CardCvcBox_KeyDown;
     }
 
     private static void DigitsOnly_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -59,6 +67,44 @@ public partial class PaymentView : UserControl
         {
             CardExpiryMonthBox.Focus();
             CardExpiryMonthBox.CaretIndex = CardExpiryMonthBox.Text.Length;
+            e.Handled = true;
+        }
+    }
+    private void CardExpiryMonthBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Back)
+        {
+            return;
+        }
+
+        if (CardExpiryMonthBox.SelectionLength > 0)
+        {
+            return;
+        }
+
+        if (CardExpiryMonthBox.Text.Length == 0)
+        {
+            CardNumberBox.Focus();
+            CardNumberBox.CaretIndex = CardNumberBox.Text.Length;
+            e.Handled = true;
+        }
+    }
+    private void CardCvcBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Back)
+        {
+            return;
+        }
+
+        if (CardCvcBox.SelectionLength > 0)
+        {
+            return;
+        }
+
+        if (CardCvcBox.Text.Length == 0)
+        {
+            CardExpiryYearBox.Focus();
+            CardExpiryYearBox.CaretIndex = CardExpiryYearBox.Text.Length;
             e.Handled = true;
         }
     }
@@ -90,6 +136,31 @@ public partial class PaymentView : UserControl
 
         return true;
     }
+    private void CardNumberBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+        e.Handled = true; 
+        CardExpiryMonthBox.Focus();
+        CardExpiryMonthBox.SelectAll();
+    }
+    private void CardExpiryYearBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+        e.Handled = true;
+        CardCvcBox.Focus();
+        CardCvcBox.SelectAll();
+    }
+
+    private void CardCvcBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+        e.Handled = true;
+        _ = PayAsync();
+    }
+
 
     private void CardExpiryMonthBox_TextChanged(object sender, TextChangedEventArgs e)
     {
@@ -104,6 +175,9 @@ public partial class PaymentView : UserControl
             CardExpiryYearBox.SelectAll();
         }
     }
+
+
+
 
     private void CardExpiryMonthBox_KeyDown(object sender, KeyEventArgs e)
     {
@@ -126,6 +200,8 @@ public partial class PaymentView : UserControl
             }
         }
 
+
+
         if (CardExpiryMonthBox.Text.Length >= 2)
         {
             CardExpiryYearBox.Focus();
@@ -141,6 +217,63 @@ public partial class PaymentView : UserControl
 
     private void PayButton_Click(object sender, RoutedEventArgs e)
     {
+        _ = PayAsync();
+    }
+
+    private async System.Threading.Tasks.Task PayAsync()
+    {
+        //if (UiServices.CurrentUser is null)
+        //{
+        //    ErrorMessageText.Text = "Пользователь не авторизованн";
+        //    ErrorMessageText.Margin = new Thickness(0, -9, 0, 9);
+        //    UiServices.Navigation.Navigate(AppPage.Login);
+        //    return;
+        //}
+
+        var number = CardNumberBox.Text.Trim();
+        var cvc = CardCvcBox.Text.Trim();
+        var expMonth = string.IsNullOrEmpty(CardExpiryMonthBox.Text) ? 0 : int.Parse(CardExpiryMonthBox.Text.Trim());
+        var expYear2 = string.IsNullOrEmpty(CardExpiryYearBox.Text) ? 0 : int.Parse(CardExpiryYearBox.Text.Trim());
+
+        if (UiServices.CurrentUser is null)
+        {
+            ErrorMessageText.Text = "Пользователь не авторизован";
+            ErrorMessageText.Margin = new Thickness(0, -9, 0, 9);
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
+        var userId = UiServices.CurrentUser.Id;
+        var plan = MapPlan(_plan.Kind);
+
+        var result = await PaymentAppService.PaySubscriptionAsync(
+            UiServices.PaymentMethodRepository,
+            UiServices.SubscriptionRepository,
+            userId,
+            plan,
+            number,
+            expMonth,
+            expYear2,
+            cvc);
+
+        if (!result.IsSuccess)
+        {
+            ErrorMessageText.Text = result.Error;
+            ErrorMessageText.Margin = new Thickness(0, -9, 0, 9);
+            return;
+        }
+
         UiServices.Navigation.Navigate(AppPage.Entries);
+    }
+
+    private static SubscriptionPlan MapPlan(SubscriptionPlanKind kind)
+    {
+        return kind switch
+        {
+            SubscriptionPlanKind.Month => SubscriptionPlan.Monthly,
+            SubscriptionPlanKind.HalfYear => SubscriptionPlan.HalfEar,
+            SubscriptionPlanKind.Year => SubscriptionPlan.Yearly,
+            _ => SubscriptionPlan.Monthly
+        };
     }
 }

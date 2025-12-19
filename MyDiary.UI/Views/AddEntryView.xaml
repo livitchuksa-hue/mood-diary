@@ -165,7 +165,5 @@
                 </Grid>
             </Grid>
         </Border>
-
-        <TextBlock Grid.Row="2" Text="Пока это только UI: данные не сохраняются. Кнопка Применить вернёт на Записи." Foreground="{StaticResource Brush.TextMuted}" Margin="0,16,0,0" />
     </Grid>
 </UserControl>

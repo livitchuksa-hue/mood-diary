@@ -167,7 +167,5 @@
                 </Grid>
             </Grid>
         </Border>
-
-        <TextBlock Grid.Row="2" Text="Пока это только UI: данные сохраняются в демо-хранилище AppData." Foreground="{StaticResource Brush.TextMuted}" Margin="0,16,0,0" />
     </Grid>
 </UserControl>

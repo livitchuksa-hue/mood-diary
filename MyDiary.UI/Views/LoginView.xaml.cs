@@ -1,8 +1,10 @@
 using System.Windows.Controls;
 using System.Windows;
 using MyDiary.Services.Security;
+using MyDiary.Services.Subscriptions;
 using MyDiary.UI.Security;
 using MyDiary.UI.Navigation;
+using System.Windows.Media;
 
 namespace MyDiary.UI.Views;
 
@@ -92,25 +94,49 @@ public partial class LoginView : UserControl
 
         if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
         {
-            MessageBox.Show("Введите логин и пароль");
+            ElementGrid.Children.Remove(ErrorText);
+            ErrorText.Margin = new Thickness(0, 18, 0, 0);
+            ErrorText.Text = "Введите логин и пароль";
+            ElementGrid.Children.Add(ErrorText);
             return;
         }
 
         var user = await UiServices.UserRepository.GetByLoginAsync(login);
         if (user is null)
         {
-            MessageBox.Show("Неверный логин или пароль");
+            ElementGrid.Children.Remove(ErrorText);
+            ErrorText.Margin = new Thickness(0, 18, 0, 0);
+            ErrorText.Text = "Неверный логин или пароль";
+            ElementGrid.Children.Add(ErrorText);
+
             return;
         }
 
         var ok = PasswordHasher.Verify(password, user.PasswordHash);
         if (!ok)
         {
-            MessageBox.Show("Неверный логин или пароль");
+            ElementGrid.Children.Remove(ErrorText);
+            ErrorText.Margin = new Thickness(0, 18, 0, 0);
+            ErrorText.Text = "Неверный логин или пароль";
+            ElementGrid.Children.Add(ErrorText);
+
             return;
         }
 
         UiServices.CurrentUser = user;
+
+        SubscriptionGateResult gate;
+        try
+        {
+            gate = await SubscriptionGateService.EnsureAccessAsync(
+                UiServices.SubscriptionRepository,
+                UiServices.PaymentMethodRepository,
+                user.Id);
+        }
+        catch
+        {
+            gate = new SubscriptionGateResult(SubscriptionGateResultType.NeedPayment, null, "Ошибка проверки подписки");
+        }
 
         if (RememberMeCheckBox?.IsChecked == true)
         {
@@ -120,8 +146,16 @@ public partial class LoginView : UserControl
         {
             RememberMeStorage.Clear();
         }
+        ElementGrid.Children.Remove(ErrorText);
 
-        UiServices.Navigation.Navigate(AppPage.Entries);
+        if (gate.Type == SubscriptionGateResultType.Allowed)
+        {
+            UiServices.Navigation.Navigate(AppPage.Entries);
+        }
+        else
+        {
+            UiServices.Navigation.Navigate(AppPage.Subscription);
+        }
     }
 
     private void GoToRegisterButton_Click(object sender, RoutedEventArgs e)

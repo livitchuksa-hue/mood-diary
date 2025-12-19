@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using MyDiary.UI;
+using MyDiary.Services.Diary;
 using MyDiary.UI.Models;
 using MyDiary.UI.Navigation;
 
@@ -68,20 +68,30 @@ public partial class EditEntryView : UserControl
             ActivitiesList.ItemsSource = _activities;
         }
 
-        Loaded += (_, _) =>
+        Loaded += async (_, _) =>
         {
-            LoadActivities();
+            await LoadActivitiesAsync();
             RestoreSelectedActivities();
             SyncActivitiesEmptyState();
             SyncDeleteButton();
         };
     }
 
-    private void LoadActivities()
+    private async System.Threading.Tasks.Task LoadActivitiesAsync()
     {
         _activities.Clear();
 
-        foreach (var a in AppData.GetAllActivities())
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
+        var names = await DiaryEntryAppService.GetAllActivityNamesAsync(
+            UiServices.UserActivityRepository,
+            UiServices.CurrentUser.Id);
+
+        foreach (var a in names)
         {
             var item = new ActivitySelectionItem(a);
             item.PropertyChanged += (_, _) => SyncDeleteButton();
@@ -158,20 +168,60 @@ public partial class EditEntryView : UserControl
 
     private void ApplyButton_Click(object sender, RoutedEventArgs e)
     {
+        _ = ApplyAsync();
+    }
+
+    private async System.Threading.Tasks.Task ApplyAsync()
+    {
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
         if (_editing is null)
         {
             UiServices.Navigation.Navigate(AppPage.Entries);
             return;
         }
 
+        var userId = UiServices.CurrentUser.Id;
         var date = _editing.Date;
-        var title = TitleBox?.Text ?? "";
-        var content = ContentBox?.Text ?? "";
+        var title = TitleBox?.Text ?? string.Empty;
+        var content = ContentBox?.Text ?? string.Empty;
         var moodLevel = GetSelectedMoodLevel();
         var activities = _activities.Where(a => a.IsSelected).Select(a => a.Name).ToList();
 
-        AppData.UpdateEntry(_editing.Id, date, title, moodLevel, activities, content);
-        UiServices.Navigation.Navigate(AppPage.EntryDetails, AppData.GetPreviewById(_editing.Id) ?? _editing);
+        await DiaryEntryAppService.UpdateAsync(
+            UiServices.DiaryEntryRepository,
+            UiServices.UserActivityRepository,
+            userId,
+            _editing.Id,
+            date,
+            title,
+            content,
+            moodLevel,
+            activities);
+
+        var updatedDto = await DiaryEntryAppService.GetPreviewByIdAsync(UiServices.DiaryEntryRepository, _editing.Id);
+        if (updatedDto is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Entries);
+            return;
+        }
+
+        var updated = new EntryPreview(
+            Id: updatedDto.Id,
+            Date: updatedDto.Date,
+            Title: updatedDto.Title,
+            Summary: updatedDto.Summary,
+            Content: updatedDto.Content,
+            MoodLevel: updatedDto.MoodStatus,
+            Mood: DiaryEntryAppService.MoodEmoji(updatedDto.MoodStatus),
+            CreatedAt: updatedDto.CreatedAtUtc.ToLocalTime(),
+            Activities: updatedDto.Activities);
+
+        UiServices.Navigation.Navigate(AppPage.EntryDetails, updated);
     }
 
     private void DeleteActivitiesButton_Click(object sender, RoutedEventArgs e)

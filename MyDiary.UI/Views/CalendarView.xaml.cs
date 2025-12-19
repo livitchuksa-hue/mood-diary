@@ -2,7 +2,9 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using MyDiary.UI;
+using MyDiary.Services.Diary;
+using MyDiary.UI.Navigation;
+
 
 namespace MyDiary.UI.Views;
 
@@ -11,6 +13,8 @@ public partial class CalendarView : UserControl
     private DateTime _monthCursor = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     private bool _isInitialized;
     private readonly DateTime _minMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+    private Dictionary<DateOnly, int> _moodByDate = new();
 
     private static Brush MoodBrush(int moodLevel)
     {
@@ -59,30 +63,54 @@ public partial class CalendarView : UserControl
         }
 
         _isInitialized = true;
-        Render();
+        _ = LoadAndRenderAsync();
     }
 
     private void PrevButton_Click(object sender, RoutedEventArgs e)
     {
         _monthCursor = _monthCursor.AddMonths(-1);
-        Render();
+        _ = LoadAndRenderAsync();
     }
 
     private void NextButton_Click(object sender, RoutedEventArgs e)
     {
         _monthCursor = _monthCursor.AddMonths(1);
-        Render();
+        _ = LoadAndRenderAsync();
     }
 
-    private void Render()
+    private async System.Threading.Tasks.Task LoadAndRenderAsync()
     {
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(Navigation.AppPage.Login);
+            return;
+        }
+
         PeriodText.Text = _monthCursor.ToString("MMMM yyyy");
 
         var maxMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
         NextButton.IsEnabled = _monthCursor < maxMonth;
         PrevButton.IsEnabled = _monthCursor > _minMonth;
 
+        await LoadMoodMapAsync();
         RenderDays();
+    }
+
+    private async System.Threading.Tasks.Task LoadMoodMapAsync()
+    {
+        var firstOfMonth = new DateOnly(_monthCursor.Year, _monthCursor.Month, 1);
+        var offset = ((int)firstOfMonth.DayOfWeek + 6) % 7;
+        var daysInMonth = DateTime.DaysInMonth(_monthCursor.Year, _monthCursor.Month);
+        var requiredCells = offset + daysInMonth;
+        var rows = requiredCells <= 35 ? 5 : 6;
+        var gridStart = firstOfMonth.AddDays(-offset);
+        var gridEnd = gridStart.AddDays(rows * 7 - 1);
+
+        _moodByDate = await DiaryEntryAppService.GetMoodLevelsByDateAsync(
+            UiServices.DiaryEntryRepository,
+            UiServices.CurrentUser!.Id,
+            gridStart,
+            gridEnd);
     }
 
     private void RenderDays()
@@ -105,7 +133,7 @@ public partial class CalendarView : UserControl
             var date = start.AddDays(i);
             var isCurrentMonth = date.Month == firstOfMonth.Month;
 
-            var moodLevel = AppData.GetMoodLevel(date);
+            var moodLevel = _moodByDate.TryGetValue(date, out var ml) ? ml : 0;
             var mood = moodLevel == 0 ? (Brush)Application.Current.Resources["Brush.Surface"] : MoodBrush(moodLevel);
 
             var cellBackground = moodLevel == 0
@@ -135,6 +163,18 @@ public partial class CalendarView : UserControl
                     ? (Brush)Application.Current.Resources["Brush.Text"]
                     : (Brush)Application.Current.Resources["Brush.TextMuted"]
             };
+
+            // Добавляем обработчик клика только для дней текущего месяца
+            if (isCurrentMonth)
+            {
+                border.Cursor = System.Windows.Input.Cursors.Hand;
+                var capturedDate = date; // Захватываем дату для замыкания
+                border.MouseLeftButtonUp += (_, _) =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"Calendar clicked date: {capturedDate:dd.MM.yyyy}");
+                    UiServices.Navigation.Navigate(Navigation.AppPage.AddEntry, capturedDate);
+                };
+            }
 
             DaysGrid.Children.Add(border);
         }

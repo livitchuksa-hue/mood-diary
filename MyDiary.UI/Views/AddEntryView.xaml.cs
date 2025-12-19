@@ -5,9 +5,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using MyDiary.Services.Diary;
 using MyDiary.UI.Models;
 using MyDiary.UI.Navigation;
-using MyDiary.UI;
 
 namespace MyDiary.UI.Views;
 
@@ -48,6 +48,7 @@ public partial class AddEntryView : UserControl
     }
 
     private readonly EntryPreview? _editing;
+    private readonly DateOnly _createDate;
     private readonly ObservableCollection<ActivitySelectionItem> _activities = new();
 
     public AddEntryView(object? parameter)
@@ -55,7 +56,11 @@ public partial class AddEntryView : UserControl
         InitializeComponent();
 
         _editing = parameter as EntryPreview;
-        HeaderText.Text = _editing is null ? "Создать запись" : "Изменить запись";
+        _createDate = parameter is DateOnly d ? d : DateOnly.FromDateTime(System.DateTime.Today);
+        HeaderText.Text = _editing is null ? $"Создать запись • {_createDate:dd.MM.yyyy}" : "Изменить запись";
+        
+        // Отладка: выведем в консоль, какую дату получили
+        System.Diagnostics.Debug.WriteLine($"AddEntryView received date: {_createDate:dd.MM.yyyy}, parameter type: {parameter?.GetType().Name ?? "null"}");
 
         if (ActivitiesList is not null)
         {
@@ -69,19 +74,29 @@ public partial class AddEntryView : UserControl
             SetMood(_editing.MoodLevel);
         }
 
-        Loaded += (_, _) =>
+        Loaded += async (_, _) =>
         {
-            LoadActivities();
+            await LoadActivitiesAsync();
             RestoreSelectedActivities();
             SyncActivitiesEmptyState();
         };
     }
 
-    private void LoadActivities()
+    private async System.Threading.Tasks.Task LoadActivitiesAsync()
     {
         _activities.Clear();
 
-        foreach (var a in AppData.GetAllActivities())
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
+        var names = await DiaryEntryAppService.GetAllActivityNamesAsync(
+            UiServices.UserActivityRepository,
+            UiServices.CurrentUser.Id);
+
+        foreach (var a in names)
         {
             _activities.Add(new ActivitySelectionItem(a));
         }
@@ -135,19 +150,52 @@ public partial class AddEntryView : UserControl
 
     private void ApplyButton_Click(object sender, RoutedEventArgs e)
     {
-        var date = _editing?.Date ?? DateOnly.FromDateTime(System.DateTime.Today);
-        var title = TitleBox?.Text ?? "";
-        var content = ContentBox?.Text ?? "";
+        _ = ApplyAsync();
+    }
+
+    private async System.Threading.Tasks.Task ApplyAsync()
+    {
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
+        var userId = UiServices.CurrentUser.Id;
+        var date = _editing?.Date ?? _createDate;
+        
+        // Отладка: выведем дату, которая будет передана в CreateAsync
+        System.Diagnostics.Debug.WriteLine($"ApplyAsync: _createDate={_createDate:dd.MM.yyyy}, final date={date:dd.MM.yyyy}, _editing={_editing?.Title ?? "null"}");
+        
+        var title = string.IsNullOrWhiteSpace(TitleBox?.Text) ? GetSelectedMoodName() : TitleBox.Text;
+        var content = ContentBox?.Text ?? string.Empty;
         var moodLevel = GetSelectedMoodLevel();
         var activities = _activities.Where(a => a.IsSelected).Select(a => a.Name).ToList();
 
         if (_editing is null)
         {
-            AppData.AddEntry(date, title, moodLevel, activities, content);
+            await DiaryEntryAppService.CreateAsync(
+                UiServices.DiaryEntryRepository,
+                UiServices.UserActivityRepository,
+                userId,
+                date,
+                title,
+                content,
+                moodLevel,
+                activities);
         }
         else
         {
-            AppData.UpdateEntry(_editing.Id, date, title, moodLevel, activities, content);
+            await DiaryEntryAppService.UpdateAsync(
+                UiServices.DiaryEntryRepository,
+                UiServices.UserActivityRepository,
+                userId,
+                _editing.Id,
+                date,
+                title,
+                content,
+                moodLevel,
+                activities);
         }
 
         UiServices.Navigation.Navigate(AppPage.Entries);
@@ -164,14 +212,15 @@ public partial class AddEntryView : UserControl
         return 3;
     }
 
-    private string GetSelectedMoodEmoji()
+    private string GetSelectedMoodName()
     {
-        if (Mood1.IsChecked == true) return "😔";
-        if (Mood2.IsChecked == true) return "😣";
-        if (Mood3.IsChecked == true) return "😐";
-        if (Mood4.IsChecked == true) return "🙂";
-        if (Mood5.IsChecked == true) return "😊";
+        if (Mood1.IsChecked == true) return "Плохо";
+        if (Mood2.IsChecked == true) return "Ниже нормы";
+        if (Mood3.IsChecked == true) return "Нормально";
+        if (Mood4.IsChecked == true) return "Хорошо";
+        if (Mood5.IsChecked == true) return "Отлично";
 
         return "😐";
     }
+    
 }

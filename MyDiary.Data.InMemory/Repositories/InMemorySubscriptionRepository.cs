@@ -5,7 +5,12 @@ namespace MyDiary.Data.InMemory.Repositories;
 
 public class InMemorySubscriptionRepository : ISubscriptionRepository
 {
-    public Task<Subscription?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public Task<Subscription?> GetLatestByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Subscription?> GetActiveByUserIdAsync(Guid userId, DateTime nowUtc, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

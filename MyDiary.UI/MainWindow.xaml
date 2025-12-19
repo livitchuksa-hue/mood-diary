@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MyDiary.UI"
         xmlns:controls="clr-namespace:MyDiary.UI.Controls"
         mc:Ignorable="d"
-        Title="MyDiary" Height="800" Width="1200"
+        Title="MyDiary" Height="1080" Width="1920"
         Background="{StaticResource Brush.Background}">
     <Grid>
         <Grid.RowDefinitions>

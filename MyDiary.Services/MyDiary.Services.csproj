@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MyDiary.Domain\MyDiary.Domain.csproj" />
     <ProjectReference Include="..\MyDiary.Data.Interfaces\MyDiary.Data.Interfaces.csproj" />
+    <ProjectReference Include="..\MyDiary.Data.SqlServer\MyDiary.Data.SqlServer.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

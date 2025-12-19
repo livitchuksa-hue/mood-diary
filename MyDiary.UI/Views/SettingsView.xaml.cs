@@ -6,10 +6,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using MyDiary.Services.Activities;
 using MyDiary.UI.Models;
 using MyDiary.UI.Properties;
 using MyDiary.UI.Security;
 using MyDiary.UI.Themes;
+using MyDiary.Domain.Entities;
 
 namespace MyDiary.UI.Views;
 
@@ -19,41 +21,13 @@ public partial class SettingsView : UserControl
     {
         InitializeComponent();
 
-        Loaded += (_, _) =>
+        Loaded += async (_, _) =>
         {
-            SyncLanguageHint();
             SyncThemeCombo();
-            RenderActivities();
+            await RenderActivitiesAsync();
         };
-    }
+        UserName.Text= UiServices.CurrentUser.Name;
 
-    private void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SyncLanguageHint();
-
-        if (LanguageCombo?.SelectedIndex == 1)
-        {
-            Settings.Default.Language = "en";
-        }
-        else
-        {
-            Settings.Default.Language = "ru";
-        }
-
-        Settings.Default.Save();
-    }
-
-    private void SyncLanguageHint()
-    {
-        if (ActivityHint is null)
-        {
-            return;
-        }
-
-        if (LanguageCombo?.SelectedItem is ComboBoxItem item)
-        {
-            ActivityHint.Text = $"Выбран язык: {item.Content}";
-        }
     }
 
     private void SyncThemeCombo()
@@ -67,27 +41,30 @@ public partial class SettingsView : UserControl
         ThemeCombo.SelectedIndex = string.Equals(theme, "dark", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
     }
 
-    private static IReadOnlyList<ActivityEditModel> BuildDemoActivities()
+    private async Task RenderActivitiesAsync()
     {
-        return new List<ActivityEditModel>
+        if (UiServices.CurrentUser is null)
         {
-        };
-    }
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
 
-    private void RenderActivities()
-    {
-        var activities = BuildDemoActivities();
+        var userId = UiServices.CurrentUser.Id;
+        var activities = await UserActivityAppService.GetByUserIdAsync(UiServices.UserActivityRepository, userId);
+        var models = activities
+            .Select(x => new ActivityEditModel(x.Id, x.Name, x.Description))
+            .ToList();
 
         if (ActivitiesList is null)
         {
             return;
         }
 
-        ActivitiesList.ItemsSource = activities;
+        ActivitiesList.ItemsSource = models;
 
         if (ActivitiesEmptyStatePanel is not null)
         {
-            ActivitiesEmptyStatePanel.Visibility = activities.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            ActivitiesEmptyStatePanel.Visibility = models.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
@@ -97,13 +74,15 @@ public partial class SettingsView : UserControl
         {
             Settings.Default.Theme = "dark";
             Settings.Default.Save();
-            MessageBox.Show("Тема будет применена после перезапуска приложения");
+            InfoMessageText.Text="Тема будет применена после перезапуска приложения";
+            InfoMessageText.Margin = new Thickness(0, 9, 0, 0);
             return;
         }
 
         Settings.Default.Theme = "light";
         Settings.Default.Save();
-        MessageBox.Show("Тема будет применена после перезапуска приложения");
+        InfoMessageText.Text = "Тема будет применена после перезапуска приложения";
+        InfoMessageText.Margin = new Thickness(0, 9, 0, 0);
     }
 
     private void ActivityCard_Click(object sender, RoutedEventArgs e)

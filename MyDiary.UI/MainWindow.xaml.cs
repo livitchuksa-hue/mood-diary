@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -7,6 +6,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MyDiary.Services.Payments;
+using MyDiary.Services.Subscriptions;
 using MyDiary.UI.Navigation;
 using MyDiary.UI.Security;
 using MyDiary.UI.ViewModels;
@@ -51,7 +52,23 @@ public partial class MainWindow : Window
             }
 
             UiServices.CurrentUser = user;
-            UiServices.Navigation.Navigate(AppPage.Entries);
+
+            SubscriptionGateResult gate;
+            try
+            {
+                gate = await SubscriptionGateService.EnsureAccessAsync(
+                    UiServices.SubscriptionRepository,
+                    UiServices.PaymentMethodRepository,
+                    user.Id);
+            }
+            catch
+            {
+                gate = new SubscriptionGateResult(SubscriptionGateResultType.NeedPayment, null, "Ошибка проверки подписки");
+            }
+
+            UiServices.Navigation.Navigate(gate.Type == SubscriptionGateResultType.Allowed
+                ? AppPage.Entries
+                : AppPage.Subscription);
         }
         catch
         {
@@ -61,7 +78,7 @@ public partial class MainWindow : Window
 
     private void NavigateInternal(AppPage page, object? parameter)
     {
-        TopBar.Visibility = page is AppPage.Statistics or AppPage.Entries or AppPage.AddEntry or AppPage.EditEntry or AppPage.Settings or AppPage.CreateActivity or AppPage.EditActivity or AppPage.EntryDetails
+        TopBar.Visibility = page is AppPage.Statistics or AppPage.Entries or AppPage.AddEntry or AppPage.EditEntry or AppPage.Settings or AppPage.CreateActivity or AppPage.EditActivity or AppPage.EntryDetails or AppPage.DayEntries
             ? Visibility.Visible
             : Visibility.Collapsed;
 

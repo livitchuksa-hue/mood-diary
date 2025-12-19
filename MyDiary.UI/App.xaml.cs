@@ -35,7 +35,16 @@ public partial class App : Application
         //userRepo, entryRepo, activityRepo, subscriptionRepo
         _dbContext.Database.Migrate();
         IUserRepository userRepo = new SqlServerUserRepository(_dbContext);
+        ISubscriptionRepository subscriptionRepo = new SqlServerSubscriptionRepository(_dbContext);
+        IPaymentMethodRepository paymentMethodRepo = new SqlServerPaymentMethodRepository(_dbContext);
+        IDiaryEntryRepository diaryEntryRepo = new SqlServerDiaryEntryRepository(_dbContext);
+        IUserActivityRepository userActivityRepo = new SqlServerUserActivityRepository(_dbContext);
         UiServices.UserRepository = userRepo;
+        UiServices.SubscriptionRepository = subscriptionRepo;
+        UiServices.PaymentMethodRepository = paymentMethodRepo;
+        UiServices.DiaryEntryRepository = diaryEntryRepo;
+        UiServices.UserActivityRepository = userActivityRepo;
+        UiServices.DbContext = _dbContext;
         var mainWindow = new MainWindow();
         mainWindow.Show();
     }

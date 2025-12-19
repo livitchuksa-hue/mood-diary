@@ -158,7 +158,7 @@
 
                         <TextBlock Text="Краткое описание" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                            <TextBlock Text="Пока это заглушка. Здесь будет текст: какие эмоции встречаются чаще, динамика по неделям, и т.д." TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
+                            <TextBlock x:Name="DescText" Text="" TextWrapping="Wrap" Foreground="{StaticResource Brush.TextMuted}" />
                         </ScrollViewer>
                     </Grid>
                 </Border>

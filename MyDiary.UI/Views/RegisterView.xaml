@@ -18,52 +18,55 @@
                 <TextBlock Text="Регистрация" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,8" />
 
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="12" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                    <Grid Canvas.ZIndex="1">
+                        <Grid.ColumnDefinitions>
+                              <ColumnDefinition Width="*" />
+                              <ColumnDefinition Width="8.667" />
+                              <ColumnDefinition Width="3.333"/>
+                              <ColumnDefinition Width="*" />
+                          </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Логин" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
-                        <TextBox x:Name ="LoginTextBox" Height="40" Margin="0,0,0,12" />
+                          <StackPanel Grid.Column="0">
+                              <TextBlock Text="Логин" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
+                              <TextBox x:Name ="LoginTextBox" Height="40" Margin="0,0,0,12" />
 
-                        <TextBlock Text="Имя" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
-                        <TextBox x:Name ="NameTextBox" Height="40" Margin="0,0,0,12" />
-                    </StackPanel>
+                              <TextBlock Text="Имя" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
+                              <TextBox x:Name ="NameTextBox" Height="40" Margin="0,0,0,12" />
+                          </StackPanel>
 
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Пароль" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
-                        <Grid Margin="0,0,0,12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="44" />
-                            </Grid.ColumnDefinitions>
-                            <Grid>
-                                <PasswordBox x:Name="PasswordBox" Height="40" PasswordChanged="PasswordBox_PasswordChanged" />
-                                <TextBox x:Name="PasswordTextBox" Height="40" Visibility="Collapsed" TextChanged="PasswordTextBox_TextChanged" />
-                            </Grid>
-                            <Button Grid.Column="1" Content="👁" Style="{StaticResource GhostButton}" MinWidth="44" MinHeight="40" Padding="0" Click="TogglePasswordButton_Click" />
+                          <StackPanel Grid.Column="3">
+                              <TextBlock Text="Пароль" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
+                              <Grid Margin="0,0,0,12">
+                                  <Grid.ColumnDefinitions>
+                                      <ColumnDefinition Width="*" />
+                                      <ColumnDefinition Width="44" />
+                                  </Grid.ColumnDefinitions>
+                                  <Grid>
+                                      <PasswordBox x:Name="PasswordBox" Height="40" PasswordChanged="PasswordBox_PasswordChanged" />
+                                      <TextBox x:Name="PasswordTextBox" Height="40" Visibility="Collapsed" TextChanged="PasswordTextBox_TextChanged" />
+                                  </Grid>
+                                  <Button Grid.Column="1" Content="👁" Style="{StaticResource GhostButton}" MinWidth="44" MinHeight="40" Padding="0" Click="TogglePasswordButton_Click" />
+                              </Grid>
+
+                              <TextBlock Text="Повтор пароля" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
+                              <Grid Margin="0,0,0,12">
+                                  <Grid.ColumnDefinitions>
+                                      <ColumnDefinition Width="*" />
+                                      <ColumnDefinition Width="44" />
+                                  </Grid.ColumnDefinitions>
+                                  <Grid>
+                                      <PasswordBox x:Name="RepeatPasswordBox" Height="40" PasswordChanged="RepeatPasswordBox_PasswordChanged" />
+                                      <TextBox x:Name="RepeatPasswordTextBox" Height="40" Visibility="Collapsed" TextChanged="RepeatPasswordTextBox_TextChanged" />
+                                  </Grid>
+                                  <Button Grid.Column="1" Content="👁" Style="{StaticResource GhostButton}" MinWidth="44" MinHeight="40" Padding="0" Click="ToggleRepeatPasswordButton_Click" />
+                              </Grid>
+
+                          </StackPanel>
                         </Grid>
-
-                        <TextBlock Text="Повтор пароля" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,6" />
-                        <Grid Margin="0,0,0,12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="44" />
-                            </Grid.ColumnDefinitions>
-                            <Grid>
-                                <PasswordBox x:Name="RepeatPasswordBox" Height="40" PasswordChanged="RepeatPasswordBox_PasswordChanged" />
-                                <TextBox x:Name="RepeatPasswordTextBox" Height="40" Visibility="Collapsed" TextChanged="RepeatPasswordTextBox_TextChanged" />
-                            </Grid>
-                            <Button Grid.Column="1" Content="👁" Style="{StaticResource GhostButton}" MinWidth="44" MinHeight="40" Padding="0" Click="ToggleRepeatPasswordButton_Click" />
-                        </Grid>
-                        
-                    </StackPanel>
-                    
+                    <TextBlock x:Name ="ErrorMessageText" Text="" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,0" Canvas.ZIndex="0"/>
                 </Grid>
-                <TextBlock x:Name ="ErrorMessageText" Text="" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,18" />
 
+               
                 <Button Content="Зарегистрироваться" Style="{StaticResource PrimaryButton}" Click="RegisterButton_Click" />
                 <Button Content="Назад" Style="{StaticResource GhostButton}" Margin="0,10,0,0" Click="BackButton_Click" />
             </StackPanel>

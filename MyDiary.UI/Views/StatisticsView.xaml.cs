@@ -5,7 +5,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using MyDiary.UI;
+using MyDiary.Services.Statistics;
+using MyDiary.UI.Navigation;
+using System.Reflection;
 
 namespace MyDiary.UI.Views;
 
@@ -23,6 +25,12 @@ public partial class StatisticsView : UserControl
 
     private DateOnly _appliedStart;
     private DateOnly _appliedEnd;
+
+    private string _legend = string.Empty;
+    private int[] _series = Array.Empty<int>();
+    private string[] _labels = Array.Empty<string>();
+    private string _desc = string.Empty;
+    private Dictionary<int, int> _counts = new() { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } };
 
     public StatisticsView()
     {
@@ -42,7 +50,7 @@ public partial class StatisticsView : UserControl
 
         var today = DateOnly.FromDateTime(DateTime.Today);
         _appliedEnd = today;
-        _appliedStart = today.AddMonths(-2);
+        _appliedStart = new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1);
 
         if (StartDatePicker is not null)
         {
@@ -57,7 +65,7 @@ public partial class StatisticsView : UserControl
         LineChartCanvas.SizeChanged += (_, _) => Render();
         PieChartCanvas.SizeChanged += (_, _) => Render();
 
-        Render();
+        _ = LoadAndRenderAsync();
     }
 
     private void ApplyButton_Click(object sender, RoutedEventArgs e)
@@ -86,7 +94,7 @@ public partial class StatisticsView : UserControl
         _appliedStart = start;
         _appliedEnd = end;
 
-        Render();
+        _ = LoadAndRenderAsync();
     }
 
     private void ModeRadio_Checked(object sender, RoutedEventArgs e)
@@ -109,6 +117,50 @@ public partial class StatisticsView : UserControl
             _mode = AggregationMode.Month;
         }
 
+        _ = LoadAndRenderAsync();
+    }
+
+    private async System.Threading.Tasks.Task LoadAndRenderAsync()
+    {
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
+        var userId = UiServices.CurrentUser.Id;
+
+        var mode = _mode switch
+        {
+            AggregationMode.Day => MoodAggregationMode.Day,
+            AggregationMode.Week => MoodAggregationMode.Week,
+            _ => MoodAggregationMode.Month
+        };
+
+        var series = await StatisticsAppService.GetMoodSeriesAsync(
+            UiServices.DiaryEntryRepository,
+            userId,
+            _appliedStart,
+            _appliedEnd,
+            mode);
+
+        _legend = series.Legend;
+        _series = series.Series;
+        _labels = series.Labels;
+
+        _counts = await StatisticsAppService.CountMoodLevelsAsync(
+            UiServices.DiaryEntryRepository,
+            userId,
+            _appliedStart,
+            _appliedEnd);
+
+        _desc = await StatisticsAppService.BuildActivityInsightAsync(
+            UiServices.DiaryEntryRepository,
+            userId,
+            _appliedStart,
+            _appliedEnd);
+        DescText.Text = _desc;
+
         Render();
     }
 
@@ -118,107 +170,13 @@ public partial class StatisticsView : UserControl
         RenderPieChart();
     }
 
-    private (string Legend, int[] Series, string[] Labels) GetSeries()
-    {
-        var filtered = AppData.GetMoodEntries(_appliedStart, _appliedEnd);
-
-        if (filtered.Count == 0)
-        {
-            return ("Нет данных за выбранный период", Array.Empty<int>(), Array.Empty<string>());
-        }
-
-        return _mode switch
-        {
-            AggregationMode.Day => BuildSeriesByDay(filtered),
-            AggregationMode.Week => BuildSeriesByWeek(filtered),
-            _ => BuildSeriesByMonth(filtered)
-        };
-    }
-
-    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByDay(IReadOnlyList<(DateOnly Date, int MoodLevel)> entries)
-    {
-        var grouped = entries
-            .GroupBy(e => e.Date)
-            .Select(g => new { Date = g.Key, Avg = (int)Math.Round(g.Average(x => x.MoodLevel)) })
-            .OrderBy(x => x.Date)
-            .ToList();
-
-        return (
-            "Серия: настроение по дням",
-            grouped.Select(x => Math.Clamp(x.Avg, 1, 5)).ToArray(),
-            grouped.Select(x => x.Date.ToDateTime(TimeOnly.MinValue).ToString("dd.MM"))
-                .ToArray()
-        );
-    }
-
-    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByWeek(IReadOnlyList<(DateOnly Date, int MoodLevel)> entries)
-    {
-        var grouped = entries
-            .GroupBy(e => WeekStartMonday(e.Date))
-            .Select(g => new { WeekStart = g.Key, Avg = (int)Math.Round(g.Average(x => x.MoodLevel)) })
-            .OrderBy(x => x.WeekStart)
-            .ToList();
-
-        return (
-            "Серия: среднее настроение по неделям",
-            grouped.Select(x => Math.Clamp(x.Avg, 1, 5)).ToArray(),
-            grouped.Select(x => x.WeekStart.ToDateTime(TimeOnly.MinValue).ToString("dd.MM"))
-                .ToArray()
-        );
-    }
-
-    private static (string Legend, int[] Series, string[] Labels) BuildSeriesByMonth(IReadOnlyList<(DateOnly Date, int MoodLevel)> entries)
-    {
-        var grouped = entries
-            .GroupBy(e => new DateOnly(e.Date.Year, e.Date.Month, 1))
-            .Select(g => new { Month = g.Key, Avg = (int)Math.Round(g.Average(x => x.MoodLevel)) })
-            .OrderBy(x => x.Month)
-            .ToList();
-
-        return (
-            "Серия: среднее настроение по месяцам",
-            grouped.Select(x => Math.Clamp(x.Avg, 1, 5)).ToArray(),
-            grouped.Select(x => x.Month.ToDateTime(TimeOnly.MinValue).ToString("MMM"))
-                .ToArray()
-        );
-    }
-
-    private static DateOnly WeekStartMonday(DateOnly date)
-    {
-        var dow = (int)date.DayOfWeek;
-        var offset = dow == 0 ? 6 : dow - 1;
-        return date.AddDays(-offset);
-    }
-
-    private static string MoodLabel(int mood)
-    {
-        return mood switch
-        {
-            1 => "Плохо",
-            2 => "Ниже нормы",
-            3 => "Среднее",
-            4 => "Хорошо",
-            5 => "Отлично",
-            _ => ""
-        };
-    }
-
-    private static Dictionary<int, int> CountMoods(IEnumerable<int> series)
-    {
-        var dict = new Dictionary<int, int> { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } };
-        foreach (var v in series)
-        {
-            var k = Math.Clamp(v, 1, 5);
-            dict[k]++;
-        }
-        return dict;
-    }
-
     private void RenderLineChart()
     {
         LineChartCanvas.Children.Clear();
 
-        var (legend, series, labels) = GetSeries();
+        var legend = _legend;
+        var series = _series;
+        var labels = _labels;
         LineLegendText.Text = legend;
 
         if (LineEmptyStatePanel is not null)
@@ -416,7 +374,7 @@ public partial class StatisticsView : UserControl
             };
 
             var label = i < labels.Length ? labels[i] : (i + 1).ToString();
-            dot.ToolTip = $"{label}\n{MoodLabel(series[i])} ({series[i]}/5)";
+            dot.ToolTip = $"{label}\n{MoodStatisticsService.MoodLabel(series[i])} ({series[i]}/5)";
 
             Canvas.SetLeft(dot, p.X - dot.Width / 2);
             Canvas.SetTop(dot, p.Y - dot.Height / 2);
@@ -431,41 +389,19 @@ public partial class StatisticsView : UserControl
             return;
         }
 
-        if (series.Length == 0)
-        {
-            KpiAvgMoodText.Text = "—";
-            KpiTrendText.Text = "—";
-            KpiMinMaxText.Text = "—";
-            KpiPointsText.Text = "0";
-            return;
-        }
-
-        var avg = series.Average();
-        var min = series.Min();
-        var max = series.Max();
-
-        var first = series.First();
-        var last = series.Last();
-        var delta = last - first;
-
-        var trend = delta switch
-        {
-            > 0 => $"↑ +{delta}",
-            < 0 => $"↓ {delta}",
-            _ => "→ 0"
-        };
-
-        KpiAvgMoodText.Text = $"{avg:0.0}/5";
-        KpiTrendText.Text = trend;
-        KpiMinMaxText.Text = $"{min}/{max}";
-        KpiPointsText.Text = series.Length.ToString();
+        var kpis = MoodStatisticsService.BuildKpis(series);
+        KpiAvgMoodText.Text = kpis.AvgText;
+        KpiTrendText.Text = kpis.TrendText;
+        KpiMinMaxText.Text = kpis.MinMaxText;
+        KpiPointsText.Text = kpis.PointsText;
     }
+
 
     private void RenderPieChart()
     {
         PieChartCanvas.Children.Clear();
 
-        var counts = AppData.CountMoodLevels(_appliedStart, _appliedEnd);
+        var counts = _counts;
         PieLegendPanel.Children.Clear();
 
         var w = Math.Max(1, PieChartCanvas.ActualWidth);
@@ -586,5 +522,6 @@ public partial class StatisticsView : UserControl
         geom.Figures.Add(fig);
 
         return new Path { Data = geom };
-    }
+    } 
 }
+    

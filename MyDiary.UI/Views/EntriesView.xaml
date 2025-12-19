@@ -25,7 +25,9 @@
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
                 <Button x:Name="PrevMonthButton" Content="◀" Width="44" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="PrevMonthButton_Click" />
-                <TextBlock x:Name="MonthText" Text="" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{StaticResource Brush.TextMuted}" />
+                <TextBlock x:Name="MonthText" Text="" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{StaticResource Brush.Text}"
+                   Cursor="Hand" MouseLeftButtonUp="MonthText_MouseLeftButtonUp"
+                   MouseEnter="MonthText_MouseEnter" MouseLeave="MonthText_MouseLeave" />
                 <Button x:Name="NextMonthButton" Content="▶" Width="44" Style="{StaticResource GhostButton}" Click="NextMonthButton_Click" />
             </StackPanel>
         </Grid>
@@ -116,7 +118,7 @@
                                                                 </StackPanel>
                                                             </StackPanel>
 
-                                                            <TextBlock Grid.Column="3" Text="{Binding CreatedAt, StringFormat={}{0:dd.MM HH:mm}}" Foreground="{StaticResource Brush.TextMuted}" VerticalAlignment="Top" />
+                                                            <TextBlock Grid.Column="3" Text="{Binding Date, StringFormat={}{0:dd.MM}}" Foreground="{StaticResource Brush.TextMuted}" VerticalAlignment="Top" />
                                                         </Grid>
                                                     </Border>
                                                 </Button>

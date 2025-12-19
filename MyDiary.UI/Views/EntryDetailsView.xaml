@@ -35,8 +35,9 @@
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
                 <Button Content="Назад" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="BackButton_Click" />
-                <Button Content="Изменить" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="EditButton_Click" />
-                <Button Content="Удалить" Style="{StaticResource PrimaryButton}" Click="DeleteButton_Click" />
+                <Button Content="Удалить" Style="{StaticResource GhostButton}"  Margin="0,0,10,0" Click="DeleteButton_Click" />
+                <Button Content="Изменить" Style="{StaticResource PrimaryButton}" Click="EditButton_Click" />
+                
             </StackPanel>
         </Grid>
 

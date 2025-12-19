@@ -15,6 +15,11 @@ public class InMemoryDiaryEntryRepository : IDiaryEntryRepository
         throw new NotImplementedException();
     }
 
+    public Task<DiaryEntry?> GetByIdForUpdateAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task AddAsync(DiaryEntry entry, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();

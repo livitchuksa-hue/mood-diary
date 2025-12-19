@@ -23,12 +23,12 @@ internal sealed class Settings : ApplicationSettingsBase
         get => (string)this[nameof(Theme)];
         set => this[nameof(Theme)] = value;
     }
-
-    [UserScopedSetting]
-    [DefaultSettingValue("ru")]
-    public string Language
-    {
-        get => (string)this[nameof(Language)];
-        set => this[nameof(Language)] = value;
-    }
+    //
+    //[UserScopedSetting]
+    //[DefaultSettingValue("ru")]
+    //public string Language
+    //{
+    //    get => (string)this[nameof(Language)];
+    //    set => this[nameof(Language)] = value;
+    //}
 }

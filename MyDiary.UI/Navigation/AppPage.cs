@@ -15,6 +15,6 @@ public enum AppPage
     EditActivity = 16,
 
     EditEntry = 19,
-
-    EntryDetails = 20
+    EntryDetails = 20,
+    DayEntries = 21
 }

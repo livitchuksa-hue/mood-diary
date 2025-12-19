@@ -1,7 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using MyDiary.UI;
+using MyDiary.Services.Diary;
 using MyDiary.UI.Models;
 using MyDiary.UI.Navigation;
 
@@ -71,9 +71,23 @@ public partial class EntryDetailsView : UserControl
 
     private void DeleteButton_Click(object sender, RoutedEventArgs e)
     {
+        _ = DeleteAsync();
+    }
+
+    private async System.Threading.Tasks.Task DeleteAsync()
+    {
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
         if (_entry is not null)
         {
-            AppData.DeleteEntry(_entry.Id);
+            await DiaryEntryAppService.DeleteAsync(
+                UiServices.DiaryEntryRepository,
+                UiServices.CurrentUser.Id,
+                _entry.Id);
         }
 
         UiServices.Navigation.Navigate(AppPage.Entries);
@@ -86,6 +100,27 @@ public partial class EntryDetailsView : UserControl
             return;
         }
 
-        UiServices.Navigation.Navigate(AppPage.EditActivity, new ActivityEditModel(activity, ""));
+        _ = OpenActivityAsync(activity);
+    }
+
+    private async System.Threading.Tasks.Task OpenActivityAsync(string activityName)
+    {
+        if (UiServices.CurrentUser is null)
+        {
+            UiServices.Navigation.Navigate(AppPage.Login);
+            return;
+        }
+
+        var found = await UiServices.UserActivityRepository.GetByUserIdAndNameAsync(
+            UiServices.CurrentUser.Id,
+            activityName);
+
+        if (found is null)
+        {
+            MessageBox.Show("Активность не найдена в базе данных");
+            return;
+        }
+
+        UiServices.Navigation.Navigate(AppPage.EditActivity, new ActivityEditModel(found.Id, found.Name, found.Description));
     }
 }
